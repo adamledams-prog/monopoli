@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly - Partie en cours</title>
+    <link rel="stylesheet" href="map-style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Informations de la partie -->
+        <div class="game-info">
+            <div class="game-header">
+                <h1>🎲 Monopoly</h1>
+                <div class="game-code-display">Code: <span id="game-code">000</span></div>
+            </div>
+            
+            <!-- Liste des joueurs -->
+            <div class="players-panel">
+                <h3>Joueurs</h3>
+                <div id="players-info"></div>
+            </div>
+
+            <!-- Zone d'actions -->
+            <div class="action-panel">
+                <button id="btn-roll-dice" class="btn-action">🎲 Lancer les dés</button>
+                <div class="dice-result" id="dice-result"></div>
+                <div class="current-turn" id="current-turn"></div>
+            </div>
+
+            <!-- Bouton quitter -->
+            <button id="btn-quit" class="btn-quit">🚪 Quitter la partie</button>
+        </div>
+
+        <!-- Plateau de jeu -->
+        <div class="board-container">
+            <div class="board">
+                <!-- Coin inférieur gauche: Prison (visite) -->
+                <div class="corner corner-bottom-left" data-position="10">
+                    <div class="corner-content">
+                        <div class="corner-icon">🚔</div>
+                        <div class="corner-name">PRISON</div>
+                        <div class="corner-sub">Visite</div>
+                    </div>
+                </div>
+
+                <!-- Côté bas (positions 1-9) de droite à gauche -->
+                <div class="cell cell-bottom" data-position="1" data-color="brown">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Boulevard de Belleville</div>
+                    <div class="cell-price">60€</div>
+                </div>
+                <div class="cell cell-bottom special" data-position="2">
+                    <div class="cell-name">Caisse de Communauté</div>
+                </div>
+                <div class="cell cell-bottom" data-position="3" data-color="brown">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue Lecourbe</div>
+                    <div class="cell-price">60€</div>
+                </div>
+                <div class="cell cell-bottom special" data-position="4">
+                    <div class="cell-name">Impôts sur le revenu</div>
+                </div>
+                <div class="cell cell-bottom station" data-position="5">
+                    <div class="cell-name">Gare Montparnasse</div>
+                    <div class="cell-price">200€</div>
+                </div>
+                <div class="cell cell-bottom" data-position="6" data-color="lightblue">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue de Vaugirard</div>
+                    <div class="cell-price">100€</div>
+                </div>
+                <div class="cell cell-bottom special" data-position="7">
+                    <div class="cell-name">Chance</div>
+                </div>
+                <div class="cell cell-bottom" data-position="8" data-color="lightblue">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue de Courcelles</div>
+                    <div class="cell-price">100€</div>
+                </div>
+                <div class="cell cell-bottom" data-position="9" data-color="lightblue">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue de la République</div>
+                    <div class="cell-price">120€</div>
+                </div>
+
+                <!-- Coin inférieur droit: Départ -->
+                <div class="corner corner-bottom-right" data-position="0">
+                    <div class="corner-content">
+                        <div class="corner-icon">←</div>
+                        <div class="corner-name">DÉPART</div>
+                    </div>
+                </div>
+
+                <!-- Côté gauche (positions 11-19) -->
+                <div class="cell cell-left" data-position="11" data-color="pink">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Boulevard de la Villette</div>
+                    <div class="cell-price">140€</div>
+                </div>
+                <div class="cell cell-left utility" data-position="12">
+                    <div class="cell-name">Compagnie d'Électricité</div>
+                    <div class="cell-price">150€</div>
+                </div>
+                <div class="cell cell-left" data-position="13" data-color="pink">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue de Neuilly</div>
+                    <div class="cell-price">140€</div>
+                </div>
+                <div class="cell cell-left" data-position="14" data-color="pink">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue de Paradis</div>
+                    <div class="cell-price">160€</div>
+                </div>
+                <div class="cell cell-left station" data-position="15">
+                    <div class="cell-name">Gare de Lyon</div>
+                    <div class="cell-price">200€</div>
+                </div>
+                <div class="cell cell-left" data-position="16" data-color="orange">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue Mozart</div>
+                    <div class="cell-price">180€</div>
+                </div>
+                <div class="cell cell-left special" data-position="17">
+                    <div class="cell-name">Caisse de Communauté</div>
+                </div>
+                <div class="cell cell-left" data-position="18" data-color="orange">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Boulevard Saint-Michel</div>
+                    <div class="cell-price">180€</div>
+                </div>
+                <div class="cell cell-left" data-position="19" data-color="orange">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Place Pigalle</div>
+                    <div class="cell-price">200€</div>
+                </div>
+
+                <!-- Coin supérieur gauche: Parc gratuit -->
+                <div class="corner corner-top-left" data-position="20">
+                    <div class="corner-content">
+                        <div class="corner-icon">🅿️</div>
+                        <div class="corner-name">PARC GRATUIT</div>
+                    </div>
+                </div>
+
+                <!-- Côté haut (positions 21-29) -->
+                <div class="cell cell-top" data-position="21" data-color="red">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue Matignon</div>
+                    <div class="cell-price">220€</div>
+                </div>
+                <div class="cell cell-top special" data-position="22">
+                    <div class="cell-name">Chance</div>
+                </div>
+                <div class="cell cell-top" data-position="23" data-color="red">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Boulevard Malesherbes</div>
+                    <div class="cell-price">220€</div>
+                </div>
+                <div class="cell cell-top" data-position="24" data-color="red">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue Henri-Martin</div>
+                    <div class="cell-price">240€</div>
+                </div>
+                <div class="cell cell-top station" data-position="25">
+                    <div class="cell-name">Gare du Nord</div>
+                    <div class="cell-price">200€</div>
+                </div>
+                <div class="cell cell-top" data-position="26" data-color="yellow">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Faubourg Saint-Honoré</div>
+                    <div class="cell-price">260€</div>
+                </div>
+                <div class="cell cell-top" data-position="27" data-color="yellow">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Place de la Bourse</div>
+                    <div class="cell-price">260€</div>
+                </div>
+                <div class="cell cell-top utility" data-position="28">
+                    <div class="cell-name">Compagnie des Eaux</div>
+                    <div class="cell-price">150€</div>
+                </div>
+                <div class="cell cell-top" data-position="29" data-color="yellow">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue La Fayette</div>
+                    <div class="cell-price">280€</div>
+                </div>
+
+                <!-- Coin supérieur droit: Allez en prison -->
+                <div class="corner corner-top-right" data-position="30">
+                    <div class="corner-content">
+                        <div class="corner-icon">👮</div>
+                        <div class="corner-name">ALLEZ EN PRISON</div>
+                    </div>
+                </div>
+
+                <!-- Côté droit (positions 31-39) -->
+                <div class="cell cell-right" data-position="31" data-color="green">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue de Breteuil</div>
+                    <div class="cell-price">300€</div>
+                </div>
+                <div class="cell cell-right" data-position="32" data-color="green">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue Foch</div>
+                    <div class="cell-price">300€</div>
+                </div>
+                <div class="cell cell-right special" data-position="33">
+                    <div class="cell-name">Caisse de Communauté</div>
+                </div>
+                <div class="cell cell-right" data-position="34" data-color="green">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Boulevard des Capucines</div>
+                    <div class="cell-price">320€</div>
+                </div>
+                <div class="cell cell-right station" data-position="35">
+                    <div class="cell-name">Gare Saint-Lazare</div>
+                    <div class="cell-price">200€</div>
+                </div>
+                <div class="cell cell-right special" data-position="36">
+                    <div class="cell-name">Chance</div>
+                </div>
+                <div class="cell cell-right" data-position="37" data-color="darkblue">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Avenue des Champs-Élysées</div>
+                    <div class="cell-price">350€</div>
+                </div>
+                <div class="cell cell-right special" data-position="38">
+                    <div class="cell-name">Taxe de Luxe</div>
+                </div>
+                <div class="cell cell-right" data-position="39" data-color="darkblue">
+                    <div class="cell-color"></div>
+                    <div class="cell-name">Rue de la Paix</div>
+                    <div class="cell-price">400€</div>
+                </div>
+
+                <!-- Centre du plateau -->
+                <div class="board-center">
+                    <h2>MONOPOLY</h2>
+                    <div class="center-logo">🎩</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="map-script.js"></script>
+</body>
+</html>

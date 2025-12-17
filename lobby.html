@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salle d'attente - Monopoly</title>
+    <link rel="stylesheet" href="lobby-style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="lobby-box">
+            <h1>🎲 Salle d'attente</h1>
+            
+            <div class="game-code-section">
+                <div class="code-label">Code de la partie</div>
+                <div class="game-code" id="game-code">000</div>
+                <p class="code-info">Partagez ce code avec vos amis pour qu'ils puissent rejoindre</p>
+            </div>
+
+            <div class="players-section">
+                <h2>Joueurs connectés</h2>
+                <div class="players-list" id="players-list">
+                    <!-- Les joueurs seront ajoutés ici dynamiquement -->
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="btn-start" class="btn btn-start" style="display: none;">
+                    🚀 Lancer la partie
+                </button>
+                <button id="btn-leave" class="btn btn-leave">
+                    🚪 Quitter
+                </button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="lobby-script.js"></script>
+</body>
+</html>

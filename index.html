@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly en Ligne</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>🎲 Monopoly en Ligne</h1>
+            
+            <div class="form-section">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" placeholder="Entrez votre prénom" maxlength="20">
+            </div>
+
+            <div class="form-section">
+                <label>Choisissez votre emoji</label>
+                <div class="emoji-selector">
+                    <button class="emoji-btn" data-emoji="😀">😀</button>
+                    <button class="emoji-btn" data-emoji="😎">😎</button>
+                    <button class="emoji-btn" data-emoji="🤩">🤩</button>
+                    <button class="emoji-btn" data-emoji="🥳">🥳</button>
+                    <button class="emoji-btn" data-emoji="🤖">🤖</button>
+                    <button class="emoji-btn" data-emoji="🐱">🐱</button>
+                    <button class="emoji-btn" data-emoji="🐶">🐶</button>
+                    <button class="emoji-btn" data-emoji="🦁">🦁</button>
+                    <button class="emoji-btn" data-emoji="🐼">🐼</button>
+                    <button class="emoji-btn" data-emoji="🦊">🦊</button>
+                    <button class="emoji-btn" data-emoji="🚀">🚀</button>
+                    <button class="emoji-btn" data-emoji="⭐">⭐</button>
+                </div>
+                <div class="emoji-selected">
+                    <span id="selected-emoji">😀</span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label for="code-partie">Code de partie (pour rejoindre)</label>
+                <input type="text" id="code-partie" placeholder="Entrez le code (optionnel)" maxlength="6">
+            </div>
+
+            <div class="actions">
+                <button id="btn-creer" class="btn btn-primary">
+                    ✨ Créer une partie
+                </button>
+                <button id="btn-rejoindre" class="btn btn-secondary">
+                    🚪 Rejoindre une partie
+                </button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
