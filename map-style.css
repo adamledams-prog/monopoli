@@ -353,10 +353,62 @@ body {
 }
 
 .center-logo {
-    font-size: 5em;
-    margin-top: 20px;
+    font-size: 4em;
+    margin-top: 10px;
+    margin-bottom: 20px;
     animation: spin 20s linear infinite, bounce 2s ease-in-out infinite;
     filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.center-cards {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.card-deck {
+    background: white;
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+}
+
+.card-deck:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card-deck.community {
+    border: 3px solid #667eea;
+}
+
+.card-deck.community:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+}
+
+.card-deck.chance {
+    border: 3px solid #11998e;
+}
+
+.card-deck.chance:hover {
+    box-shadow: 0 8px 20px rgba(17, 153, 142, 0.5);
+}
+
+.card-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.card-label {
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
 }
 
 /* Coins */
@@ -438,6 +490,14 @@ body {
 .corner-sub {
     font-size: 0.7em;
     opacity: 0.8;
+}
+
+.corner-bonus {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #11998e;
+    margin-top: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Cellules */
@@ -661,6 +721,17 @@ body {
     to {
         transform: translateX(400px);
         opacity: 0;
+    }
+}
+
+@keyframes cardAppear {
+    from {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
     }
 }
 
