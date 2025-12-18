@@ -1,0 +1,622 @@
+/* ============================================
+   SKIN MECHA - Inspiré de Brawl Stars
+   Style futuriste robotique avec néons
+   ============================================ */
+
+/* Fond avec effet métallique */
+body.skin-mecha {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background-size: 400% 400%;
+    animation: mechaBgShift 20s ease infinite;
+}
+
+@keyframes mechaBgShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Panneau d'information style robotique */
+.skin-mecha .game-info {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.5), 0 20px 50px rgba(0, 0, 0, 0.8);
+    backdrop-filter: none;
+}
+
+.skin-mecha .game-info::before {
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.2) 0%, transparent 70%);
+}
+
+/* Header avec effet néon */
+.skin-mecha .game-header h1 {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.5), 0 0 60px rgba(0, 217, 255, 0.3);
+    font-family: 'Impact', sans-serif;
+    letter-spacing: 3px;
+}
+
+/* Code de partie style tech */
+.skin-mecha .game-code-display {
+    background: linear-gradient(135deg, #00d9ff 0%, #005f73 100%);
+    border: 2px solid #0affff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .game-code-display::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.1) 10px,
+        rgba(255, 255, 255, 0.1) 20px
+    );
+    animation: mechaPattern 2s linear infinite;
+}
+
+@keyframes mechaPattern {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+}
+
+/* Cartes joueurs style mecha */
+.skin-mecha .player-item {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+.skin-mecha .player-item:hover {
+    border-color: #0affff;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+}
+
+.skin-mecha .player-item.active {
+    background: linear-gradient(135deg, #00d9ff 0%, #005f73 100%);
+    border: 2px solid #0affff;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8), 0 0 50px rgba(0, 217, 255, 0.4);
+    animation: mechaActivePulse 2s infinite;
+}
+
+@keyframes mechaActivePulse {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.8), 0 0 50px rgba(0, 217, 255, 0.4);
+        transform: scale(1.05);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 217, 255, 1), 0 0 70px rgba(0, 217, 255, 0.6);
+        transform: scale(1.08);
+    }
+}
+
+.skin-mecha .player-item-name {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .player-item.active .player-item-name {
+    color: #fff;
+}
+
+/* Bouton lancer les dés style mecha */
+.skin-mecha .btn-action {
+    background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);
+    border: 2px solid #ff006e;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5), 0 5px 15px rgba(251, 86, 7, 0.3);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.skin-mecha .btn-action:hover {
+    box-shadow: 0 0 30px rgba(255, 0, 110, 0.8), 0 8px 25px rgba(251, 86, 7, 0.5);
+    border-color: #ff4d9e;
+}
+
+/* Bouton quitter style mecha */
+.skin-mecha .btn-quit {
+    background: linear-gradient(135deg, #e63946 0%, #f72585 100%);
+    border: 2px solid #e63946;
+    box-shadow: 0 0 15px rgba(230, 57, 70, 0.4);
+}
+
+.skin-mecha .btn-quit:hover {
+    box-shadow: 0 0 25px rgba(230, 57, 70, 0.7);
+}
+
+/* Plateau style mecha */
+.skin-mecha .board {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    border: 8px solid #00d9ff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 0 25px 70px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.skin-mecha .board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 50px,
+        rgba(0, 217, 255, 0.03) 50px,
+        rgba(0, 217, 255, 0.03) 51px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Centre du plateau style mecha */
+.skin-mecha .board-center {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: inset 0 0 30px rgba(0, 217, 255, 0.2);
+}
+
+.skin-mecha .board-center h2 {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 0 0 40px rgba(0, 217, 255, 0.8);
+    font-family: 'Impact', sans-serif;
+}
+
+/* Cellules style mecha */
+.skin-mecha .cell {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+    position: relative;
+    z-index: 2;
+}
+
+.skin-mecha .cell:hover {
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border-color: #0affff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .cell-name {
+    color: #00d9ff;
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .cell-price {
+    color: #ffbe0b;
+    text-shadow: 0 0 5px rgba(255, 190, 11, 0.5);
+}
+
+/* Coins style mecha */
+.skin-mecha .corner {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+.skin-mecha .corner:hover {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.7);
+    transform: scale(1.08);
+}
+
+.skin-mecha .corner-name {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+.skin-mecha .corner-icon {
+    filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8));
+}
+
+/* Pions des joueurs style mecha */
+.skin-mecha .player-token {
+    filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
+    animation: mechaTokenFloat 2s ease-in-out infinite;
+}
+
+@keyframes mechaTokenFloat {
+    0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
+    }
+    50% {
+        transform: translateY(-5px);
+        filter: drop-shadow(0 0 15px rgba(0, 217, 255, 1)) drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+    }
+}
+
+/* Paquets de cartes style mecha */
+.skin-mecha .card-deck {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+.skin-mecha .card-deck:hover {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.7);
+}
+
+.skin-mecha .card-deck.community {
+    border-color: #fb5607;
+    box-shadow: 0 0 20px rgba(251, 86, 7, 0.4);
+}
+
+.skin-mecha .card-deck.community:hover {
+    box-shadow: 0 0 30px rgba(251, 86, 7, 0.7);
+}
+
+.skin-mecha .card-deck.chance {
+    border-color: #ff006e;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+}
+
+.skin-mecha .card-deck.chance:hover {
+    box-shadow: 0 0 30px rgba(255, 0, 110, 0.7);
+}
+
+.skin-mecha .card-label {
+    color: #00d9ff;
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+}
+
+/* Résultat des dés style mecha */
+.skin-mecha .dice-result {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(255, 0, 110, 0.5);
+}
+
+/* Messages flottants style mecha */
+.skin-mecha .floating-message {
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.8), 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Cases spéciales couleurs mecha */
+.skin-mecha .cell[data-color="brown"] .cell-color {
+    background: linear-gradient(135deg, #8b4513 0%, #ff6b35 100%);
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+}
+
+.skin-mecha .cell[data-color="lightblue"] .cell-color {
+    background: linear-gradient(135deg, #00d9ff 0%, #0affff 100%);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+.skin-mecha .cell[data-color="pink"] .cell-color {
+    background: linear-gradient(135deg, #ff006e 0%, #ff4d9e 100%);
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.8);
+}
+
+.skin-mecha .cell[data-color="orange"] .cell-color {
+    background: linear-gradient(135deg, #fb5607 0%, #ffbe0b 100%);
+    box-shadow: 0 0 10px rgba(255, 190, 11, 0.8);
+}
+
+.skin-mecha .cell[data-color="red"] .cell-color {
+    background: linear-gradient(135deg, #e63946 0%, #ff006e 100%);
+    box-shadow: 0 0 10px rgba(230, 57, 70, 0.8);
+}
+
+.skin-mecha .cell[data-color="yellow"] .cell-color {
+    background: linear-gradient(135deg, #ffbe0b 0%, #ffd60a 100%);
+    box-shadow: 0 0 10px rgba(255, 214, 10, 0.8);
+}
+
+.skin-mecha .cell[data-color="green"] .cell-color {
+    background: linear-gradient(135deg, #06ffa5 0%, #00d9ff 100%);
+    box-shadow: 0 0 10px rgba(6, 255, 165, 0.8);
+}
+
+.skin-mecha .cell[data-color="darkblue"] .cell-color {
+    background: linear-gradient(135deg, #0f3460 0%, #00d9ff 100%);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+/* Effet de scan robotique */
+.skin-mecha .board::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.8), transparent);
+    animation: mechaScan 3s linear infinite;
+    z-index: 3;
+}
+
+@keyframes mechaScan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(800px); }
+}
+
+/* ============================================
+   STYLES LOBBY MECHA
+   ============================================ */
+
+/* Container du lobby */
+.skin-mecha .container {
+    background: transparent;
+}
+
+.skin-mecha .lobby-box {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.skin-mecha .lobby-box h1 {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.5);
+}
+
+/* Code de partie dans lobby */
+.skin-mecha .game-code {
+    background: linear-gradient(135deg, #00d9ff 0%, #005f73 100%);
+    border: 2px solid #0affff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+}
+
+.skin-mecha .game-code .code-text {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Liste des joueurs dans lobby */
+.skin-mecha .players-list {
+    background: rgba(15, 52, 96, 0.3);
+    border: 2px solid #00d9ff;
+}
+
+.skin-mecha .player-card {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+.skin-mecha .player-card:hover {
+    border-color: #0affff;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+}
+
+.skin-mecha .player-card-name {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .player-card-emoji {
+    filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.6));
+}
+
+/* Boutons du lobby */
+.skin-mecha .btn-launch {
+    background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);
+    border: 2px solid #ff006e;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+}
+
+.skin-mecha .btn-launch:hover:not(:disabled) {
+    box-shadow: 0 0 30px rgba(255, 0, 110, 0.8);
+}
+
+.skin-mecha .btn-launch:disabled {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-color: #00d9ff;
+    opacity: 0.5;
+}
+
+.skin-mecha .btn-secondary {
+    background: linear-gradient(135deg, #e63946 0%, #f72585 100%);
+    border: 2px solid #e63946;
+    box-shadow: 0 0 15px rgba(230, 57, 70, 0.4);
+}
+
+.skin-mecha .btn-secondary:hover {
+    box-shadow: 0 0 25px rgba(230, 57, 70, 0.7);
+}
+
+/* Textes du lobby */
+.skin-mecha .waiting-text {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .instructions {
+    color: #00d9ff;
+    opacity: 0.8;
+}
+
+/* ============================================
+   CHAT MECHA - Style Futuriste
+   ============================================ */
+
+/* Container du chat */
+.skin-mecha .chat-box {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.6), 0 10px 40px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .chat-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 20px,
+        rgba(0, 217, 255, 0.05) 20px,
+        rgba(0, 217, 255, 0.05) 40px
+    );
+    animation: mechaChatPattern 3s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes mechaChatPattern {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+}
+
+/* Zone des messages */
+.skin-mecha .chat-messages {
+    background: rgba(15, 52, 96, 0.2);
+    border: 2px solid rgba(0, 217, 255, 0.3);
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Message système style mecha */
+.skin-mecha .chat-message.system {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #667eea;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+
+/* Message utilisateur style mecha */
+.skin-mecha .chat-message.user {
+    background: #667eea;
+    border: 2px solid #764ba2;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* Message autre joueur style mecha */
+.skin-mecha .chat-message.other {
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.3);
+}
+
+/* Message bot style mecha avec effets spéciaux */
+.skin-mecha .chat-message.bot {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #764ba2;
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.5), 0 4px 15px rgba(0, 0, 0, 0.4);
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Auteur du message */
+.skin-mecha .chat-message-author {
+    opacity: 0.8;
+}
+
+/* Zone d'input chat */
+.skin-mecha .chat-input-container {
+    background: rgba(15, 52, 96, 0.4);
+    border-top: 2px solid #00d9ff;
+    position: relative;
+    z-index: 1;
+}
+
+.skin-mecha .chat-input {
+    background: rgba(22, 33, 62, 0.8);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+    box-shadow: inset 0 0 15px rgba(0, 217, 255, 0.1);
+    font-weight: 600;
+}
+
+.skin-mecha .chat-input::placeholder {
+    color: rgba(0, 217, 255, 0.5);
+    font-style: italic;
+}
+
+.skin-mecha .chat-input:focus {
+    border-color: #0affff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.2);
+    background: rgba(22, 33, 62, 1);
+}
+
+/* Bouton envoyer style mecha */
+.skin-mecha .chat-send-btn {
+    background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);
+    border: 2px solid #ff006e;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+
+.skin-mecha .chat-send-btn:hover {
+    box-shadow: 0 0 30px rgba(255, 0, 110, 0.8), 0 8px 20px rgba(0, 0, 0, 0.4);
+    border-color: #ff4d9e;
+    transform: scale(1.15);
+}
+
+.skin-mecha .chat-send-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.6), 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar chat mecha */
+.skin-mecha .chat-messages::-webkit-scrollbar {
+    width: 10px;
+}
+
+.skin-mecha .chat-messages::-webkit-scrollbar-track {
+    background: rgba(15, 52, 96, 0.5);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 10px;
+}
+
+.skin-mecha .chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00d9ff 0%, #ff006e 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0affff 0%, #ff4d9e 100%);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+}
+
+/* Animation d'apparition des messages */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Effet de scan sur le chat */
+.skin-mecha .chat-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.8), transparent);
+    animation: mechaChatScan 2s linear infinite;
+    z-index: 2;
+    pointer-events: none;
+}
+
+@keyframes mechaChatScan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(250px); }
+}
+

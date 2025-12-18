@@ -1,5 +1,6 @@
 // Gestion de la sélection d'emoji
 let selectedEmoji = '😀';
+let selectedSkin = 'default';
 
 document.querySelectorAll('.emoji-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -17,6 +18,20 @@ document.querySelectorAll('.emoji-btn').forEach(btn => {
 
 // Sélectionner le premier emoji par défaut
 document.querySelector('.emoji-btn').classList.add('selected');
+
+// Gestion de la sélection de skin
+document.querySelectorAll('.skin-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Retirer la sélection précédente
+        document.querySelectorAll('.skin-btn').forEach(b => b.classList.remove('active'));
+        
+        // Ajouter la sélection au bouton cliqué
+        this.classList.add('active');
+        
+        // Mettre à jour le skin sélectionné
+        selectedSkin = this.getAttribute('data-skin');
+    });
+});
 
 // Fonction pour afficher un message
 function showMessage(text, type) {
@@ -62,7 +77,8 @@ document.getElementById('btn-creer').addEventListener('click', function() {
         prenom: prenom,
         emoji: selectedEmoji,
         gameCode: gameCode,
-        isHost: true
+        isHost: true,
+        skin: selectedSkin
     };
     
     localStorage.setItem('currentPlayer', JSON.stringify(player));
@@ -105,7 +121,8 @@ document.getElementById('btn-rejoindre').addEventListener('click', function() {
         prenom: prenom,
         emoji: selectedEmoji,
         gameCode: codePartie,
-        isHost: false
+        isHost: false,
+        skin: selectedSkin
     };
     
     localStorage.setItem('currentPlayer', JSON.stringify(player));

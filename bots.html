@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Bots - Monopoly</title>
+    <link rel="stylesheet" href="bots.css">
+</head>
+<body>
+    <div class="container">
+        <div class="bots-box">
+            <h1>🤖 Gestion des Bots</h1>
+            
+            <div class="bots-list">
+                <h3>Bots disponibles</h3>
+                <div id="available-bots">
+                    <!-- Les bots seront ajoutés ici -->
+                </div>
+            </div>
+
+            <div class="add-bot-section">
+                <h3>➕ Ajouter un bot</h3>
+                <div class="bot-form">
+                    <div class="form-group">
+                        <label for="bot-name">Nom du bot</label>
+                        <input type="text" id="bot-name" placeholder="Entrez le nom du bot" maxlength="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Emoji du bot</label>
+                        <div class="emoji-selector">
+                            <button class="emoji-btn" data-emoji="🤖">🤖</button>
+                            <button class="emoji-btn" data-emoji="🦾">🦾</button>
+                            <button class="emoji-btn" data-emoji="👾">👾</button>
+                            <button class="emoji-btn" data-emoji="🎮">🎮</button>
+                            <button class="emoji-btn" data-emoji="⚙️">⚙️</button>
+                            <button class="emoji-btn" data-emoji="🔧">🔧</button>
+                            <button class="emoji-btn" data-emoji="🔌">🔌</button>
+                            <button class="emoji-btn" data-emoji="💻">💻</button>
+                        </div>
+                        <div class="emoji-selected">
+                            <span id="selected-emoji">🤖</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bot-difficulty">Niveau de difficulté</label>
+                        <select id="bot-difficulty">
+                            <option value="facile">Facile 😊</option>
+                            <option value="moyen" selected>Moyen 😐</option>
+                            <option value="difficile">Difficile 😈</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-add-bot" class="btn-add">✅ Ajouter le bot</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="btn-back" class="btn-secondary">⬅️ Retour au lobby</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="bots-script.js"></script>
+</body>
+</html>

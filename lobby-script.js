@@ -6,6 +6,18 @@ if (!currentPlayer) {
     window.location.href = 'index.html';
 }
 
+// Appliquer le skin sélectionné
+const selectedSkin = currentPlayer.skin || 'default';
+if (selectedSkin === 'mecha') {
+    document.body.classList.add('skin-mecha');
+} else {
+    // Retirer le lien du skin-mecha si skin par défaut
+    const skinLink = document.getElementById('skin-stylesheet');
+    if (skinLink) {
+        skinLink.remove();
+    }
+}
+
 // Fonction pour générer un code à 3 chiffres
 function generateGameCode3Digits() {
     return Math.floor(100 + Math.random() * 900).toString();
@@ -27,6 +39,28 @@ document.getElementById('game-code').textContent = gameCode;
 // Liste des joueurs (simulée pour l'instant)
 let players = [currentPlayer];
 
+// Noms aléatoires pour les bots
+const botNames = ['RoboMax', 'CyberBot', 'MegaTron', 'NanoBot', 'TechBot', 'PixelBot', 'ByteBot'];
+const botEmojis = ['🤖', '👾', '💀', '👻', '👽', '🤡', '🤓', '🤠', '😈', '👹'];
+let usedBotNames = [];
+let usedBotEmojis = [];
+
+// Charger les bots depuis le localStorage
+let savedBots = JSON.parse(localStorage.getItem('gameBots')) || [];
+
+// Ajouter les bots à la liste des joueurs
+savedBots.forEach(bot => {
+    players.push({
+        prenom: bot.name,
+        emoji: bot.emoji || '🤖',
+        gameCode: gameCode,
+        isHost: false,
+        isBot: true
+    });
+    usedBotNames.push(bot.name);
+    usedBotEmojis.push(bot.emoji || '🤖');
+});
+
 // Fonction pour afficher les joueurs
 function displayPlayers() {
     const playersList = document.getElementById('players-list');
@@ -41,6 +75,7 @@ function displayPlayers() {
             <div class="player-info">
                 <div class="player-name">${player.prenom}</div>
                 ${player.isHost ? '<span class="player-badge">👑 Hôte</span>' : ''}
+                ${player.isBot ? '<span class="player-badge bot-badge">🤖 Bot</span>' : ''}
             </div>
         `;
         
@@ -51,10 +86,83 @@ function displayPlayers() {
 // Afficher les joueurs initiaux
 displayPlayers();
 
-// Afficher le bouton "Lancer la partie" uniquement pour l'hôte
+// Afficher les boutons uniquement pour l'hôte
 if (currentPlayer.isHost) {
     document.getElementById('btn-start').style.display = 'block';
+    document.getElementById('btn-add-bot').style.display = 'block';
+    document.getElementById('btn-remove-bots').style.display = 'block';
 }
+
+// Fonction pour obtenir un nom de bot aléatoire non utilisé
+function getRandomBotName() {
+    const availableNames = botNames.filter(name => !usedBotNames.includes(name));
+    if (availableNames.length === 0) {
+        return 'Bot' + Math.floor(Math.random() * 1000);
+    }
+    return availableNames[Math.floor(Math.random() * availableNames.length)];
+}
+
+// Fonction pour obtenir un emoji de bot aléatoire non utilisé
+function getRandomBotEmoji() {
+    const availableEmojis = botEmojis.filter(emoji => !usedBotEmojis.includes(emoji));
+    if (availableEmojis.length === 0) {
+        // Si tous les emojis sont utilisés, réinitialiser et en choisir un
+        usedBotEmojis = [];
+        return botEmojis[Math.floor(Math.random() * botEmojis.length)];
+    }
+    return availableEmojis[Math.floor(Math.random() * availableEmojis.length)];
+}
+
+// Bouton Ajouter un bot
+document.getElementById('btn-add-bot').addEventListener('click', function() {
+    if (players.length >= 10) {
+        showMessage('⚠️ Maximum 10 joueurs (joueurs + bots)', 'error');
+        return;
+    }
+    
+    const botName = getRandomBotName();
+    const botEmoji = getRandomBotEmoji();
+    usedBotNames.push(botName);
+    usedBotEmojis.push(botEmoji);
+    
+    const newBot = {
+        prenom: botName,
+        emoji: botEmoji,
+        gameCode: gameCode,
+        isHost: false,
+        isBot: true
+    };
+    
+    players.push(newBot);
+    
+    // Sauvegarder dans localStorage
+    const botsToSave = players.filter(p => p.isBot).map(p => ({
+        name: p.prenom,
+        emoji: p.emoji
+    }));
+    localStorage.setItem('gameBots', JSON.stringify(botsToSave));
+    
+    displayPlayers();
+    showMessage(`✅ ${newBot.emoji} ${newBot.prenom} ajouté !`, 'success');
+});
+
+// Bouton Supprimer les bots
+document.getElementById('btn-remove-bots').addEventListener('click', function() {
+    const botCount = players.filter(p => p.isBot).length;
+    
+    if (botCount === 0) {
+        showMessage('⚠️ Aucun bot à supprimer', 'error');
+        return;
+    }
+    
+    if (confirm(`Voulez-vous vraiment supprimer tous les bots (${botCount}) ?`)) {
+        players = players.filter(p => !p.isBot);
+        usedBotNames = [];
+        localStorage.removeItem('gameBots');
+        displayPlayers();
+        showMessage('✅ Tous les bots ont été supprimés', 'success');
+    }
+});
 
 // Fonction pour afficher un message
 function showMessage(text, type) {
@@ -81,6 +189,9 @@ document.getElementById('btn-start').addEventListener('click', function() {
     }
     
     showMessage('🚀 Lancement de la partie...', 'success');
+    
+    // Sauvegarder les joueurs (y compris les bots) dans le localStorage
+    localStorage.setItem('gamePlayers', JSON.stringify(players));
     
     // Rediriger vers le jeu
     setTimeout(() => {

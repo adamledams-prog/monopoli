@@ -1,0 +1,288 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+}
+
+.bots-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+h3 {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+/* Liste des bots */
+.bots-list {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+}
+
+#available-bots {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 100px;
+}
+
+.bot-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 5px solid #667eea;
+}
+
+.bot-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.bot-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.bot-emoji {
+    font-size: 2.5em;
+}
+
+.bot-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bot-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #333;
+}
+
+.bot-difficulty {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 600;
+}
+
+.bot-difficulty.facile {
+    color: #11998e;
+}
+
+.bot-difficulty.moyen {
+    color: #667eea;
+}
+
+.bot-difficulty.difficile {
+    color: #ee0979;
+}
+
+.btn-remove-bot {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+}
+
+.btn-remove-bot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(238, 9, 121, 0.5);
+}
+
+.no-bots {
+    text-align: center;
+    color: #999;
+    padding: 30px;
+    font-size: 1.1em;
+}
+
+/* Section ajout de bot */
+.add-bot-section {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 15px;
+}
+
+.bot-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+label {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95em;
+}
+
+input[type="text"],
+select {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+input[type="text"]:focus,
+select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+}
+
+select {
+    cursor: pointer;
+    background: white;
+}
+
+/* Sélecteur d'emoji */
+.emoji-selector {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+}
+
+.emoji-btn {
+    padding: 15px;
+    background: #f9f9f9;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.emoji-btn:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+.emoji-btn.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.emoji-selected {
+    text-align: center;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    font-size: 2em;
+    margin-top: 10px;
+}
+
+/* Boutons */
+.btn-add {
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(17, 153, 142, 0.5);
+}
+
+.btn-add:active {
+    transform: translateY(-1px);
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-secondary {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(127, 140, 141, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(127, 140, 141, 0.5);
+}
+
+.btn-secondary:active {
+    transform: translateY(-1px);
+}
+
+/* Animation d'apparition */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bot-card {
+    animation: slideInDown 0.4s ease-out;
+}

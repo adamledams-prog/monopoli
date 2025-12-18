@@ -1,3 +1,4 @@
+a droite a droite a droite 
 * {
     margin: 0;
     padding: 0;
@@ -6,12 +7,40 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: moveGrid 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes moveGrid {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
 }
 
 .container {
@@ -20,17 +49,67 @@ body {
 }
 
 .login-box {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 h1 {
     text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 2em;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 35px;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+    animation: titleGlow 3s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 25px rgba(102, 126, 234, 0.8)) drop-shadow(0 0 40px rgba(118, 75, 162, 0.6));
+    }
 }
 
 .form-section {
@@ -39,24 +118,35 @@ h1 {
 
 label {
     display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: 600;
-    font-size: 0.95em;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    font-size: 1em;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
 }
 
 input[type="text"] {
     width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 1em;
-    transition: border-color 0.3s;
+    padding: 15px 20px;
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 input[type="text"]:focus {
     outline: none;
     border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), inset 0 2px 5px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
 }
 
 .emoji-selector {
@@ -67,24 +157,53 @@ input[type="text"]:focus {
 }
 
 .emoji-btn {
-    background: #f5f5f5;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 1.5em;
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 12px;
+    font-size: 1.8em;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.emoji-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.emoji-btn:hover::before {
+    width: 150%;
+    height: 150%;
 }
 
 .emoji-btn:hover {
-    background: #e8e8e8;
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0ff 100%);
+    transform: scale(1.15) rotate(5deg);
+    border-color: #667eea;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
 .emoji-btn.selected {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-color: #667eea;
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1.15); }
+    50% { transform: scale(1.2); }
 }
 
 .emoji-selected {
@@ -93,6 +212,307 @@ input[type="text"]:focus {
     background: #f9f9f9;
     border-radius: 10px;
     font-size: 2em;
+}
+
+/* Sélecteur de skin */
+.skin-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.skin-btn {
+    background: #f9f9f9;
+    border: 3px solid #ddd;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.skin-btn:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.skin-btn.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+}
+
+.skin-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.skin-preview.default {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.skin-preview.mecha {
+    background: linear-gradient(135deg, #00d9ff 0%, #16213e 100%);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skin-preview.mecha::before {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 45px;
+    background: 
+        radial-gradient(circle at 50% 20%, #0affff 0%, transparent 30%),
+        linear-gradient(135deg, rgba(0, 217, 255, 0.3) 0%, rgba(22, 33, 62, 0.5) 100%);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 8px;
+    opacity: 0.6;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 217, 255, 0.2),
+        0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+.skin-preview.mecha::after {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 30%;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #ff006e 0%, transparent 70%);
+    border-radius: 50%;
+    animation: mechaBackgroundGlow 2s ease-in-out infinite;
+    opacity: 0.5;
+}
+
+@keyframes mechaBackgroundGlow {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.8;
+    }
+}
+
+/* Personnage Mecha */
+.mecha-character {
+    position: relative;
+    width: 50px;
+    height: 60px;
+    animation: mechaHover 2s ease-in-out infinite;
+}
+
+@keyframes mechaHover {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.05); }
+}
+
+/* Tête du Mecha */
+.mecha-head {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 18px;
+    background: linear-gradient(135deg, #00d9ff 0%, #0affff 100%);
+    border-radius: 8px 8px 4px 4px;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8), inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.mecha-visor {
+    position: absolute;
+    top: 6px;
+    left: 3px;
+    width: 14px;
+    height: 6px;
+    background: linear-gradient(90deg, #ff006e 0%, #ff4d9e 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(255, 0, 110, 0.8);
+    animation: mechaVisorGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes mechaVisorGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 110, 0.8); }
+    50% { box-shadow: 0 0 15px rgba(255, 0, 110, 1), 0 0 25px rgba(255, 0, 110, 0.5); }
+}
+
+.mecha-antenna {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 5px;
+    background: #0affff;
+    border-radius: 1px;
+    box-shadow: 0 0 5px rgba(0, 217, 255, 0.8);
+}
+
+.mecha-antenna.left {
+    left: 2px;
+    transform: rotate(-20deg);
+}
+
+.mecha-antenna.right {
+    right: 2px;
+    transform: rotate(20deg);
+}
+
+.mecha-antenna::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 3px;
+    background: #ff006e;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 0, 110, 1);
+    animation: mechaAntennaBlip 1s ease-in-out infinite;
+}
+
+@keyframes mechaAntennaBlip {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Corps du Mecha */
+.mecha-body {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 20px;
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #00d9ff;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.6), inset 0 2px 5px rgba(0, 217, 255, 0.2);
+}
+
+.mecha-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #ff006e 0%, #fb5607 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.8), 0 0 20px rgba(251, 86, 7, 0.5);
+    animation: mechaCorePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes mechaCorePulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 10px rgba(255, 0, 110, 0.8), 0 0 20px rgba(251, 86, 7, 0.5);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        box-shadow: 0 0 15px rgba(255, 0, 110, 1), 0 0 30px rgba(251, 86, 7, 0.8);
+    }
+}
+
+.mecha-arm {
+    position: absolute;
+    top: 2px;
+    width: 5px;
+    height: 16px;
+    background: linear-gradient(180deg, #00d9ff 0%, #0affff 100%);
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+}
+
+.mecha-arm.left {
+    left: -6px;
+    transform: rotate(-10deg);
+}
+
+.mecha-arm.right {
+    right: -6px;
+    transform: rotate(10deg);
+}
+
+.mecha-arm::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #ff006e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 0, 110, 0.8);
+}
+
+/* Jambes du Mecha */
+.mecha-legs {
+    position: absolute;
+    top: 38px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 18px;
+}
+
+.mecha-leg {
+    position: absolute;
+    bottom: 0;
+    width: 7px;
+    height: 15px;
+    background: linear-gradient(180deg, #16213e 0%, #00d9ff 100%);
+    border: 1px solid #00d9ff;
+    border-radius: 3px 3px 4px 4px;
+    box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+}
+
+.mecha-leg.left {
+    left: 2px;
+}
+
+.mecha-leg.right {
+    right: 2px;
+}
+
+.mecha-leg::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 9px;
+    height: 4px;
+    background: #0affff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 217, 255, 0.8);
+}
+
+.skin-btn span {
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.skin-btn.active span {
+    color: white;
 }
 
 .actions {

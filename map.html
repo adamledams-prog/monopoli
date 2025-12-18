@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly - Partie en cours</title>
     <link rel="stylesheet" href="map-style.css">
+    <link rel="stylesheet" href="skin-mecha.css" id="skin-stylesheet">
 </head>
 <body>
     <div class="game-container">
@@ -12,7 +13,6 @@
         <div class="game-info">
             <div class="game-header">
                 <h1>🎲 Monopoly</h1>
-                <div class="game-code-display">Code: <span id="game-code">000</span></div>
             </div>
             
             <!-- Liste des joueurs -->
@@ -239,16 +239,29 @@
 
                 <!-- Centre du plateau -->
                 <div class="board-center">
-                    <h2>MONOPOLY</h2>
-                    <div class="center-logo">🎩</div>
-                    <div class="center-cards">
+                    <div class="center-top">
                         <div class="card-deck community">
                             <div class="card-icon">📦</div>
                             <div class="card-label">Caisse de<br>Communauté</div>
                         </div>
+                        <div class="center-title">
+                            <h2>MONOPOLY</h2>
+                            <div class="center-logo">🎩</div>
+                        </div>
                         <div class="card-deck chance">
                             <div class="card-icon">🎲</div>
                             <div class="card-label">Chance</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Zone de chat -->
+                    <div class="game-chat">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="chat-message system">🎮 Bienvenue dans le chat !</div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" class="chat-input" placeholder="Écrivez un message..." maxlength="100">
+                            <button id="chat-send" class="chat-send-btn">📤</button>
                         </div>
                     </div>
                 </div>
