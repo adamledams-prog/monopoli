@@ -1,6 +1,7 @@
 // Gestion de la sélection d'emoji
 let selectedEmoji = '😀';
 let selectedSkin = 'default';
+let selectedMoney = 1500; // Argent de départ par défaut
 
 document.querySelectorAll('.emoji-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -30,6 +31,20 @@ document.querySelectorAll('.skin-btn').forEach(btn => {
         
         // Mettre à jour le skin sélectionné
         selectedSkin = this.getAttribute('data-skin');
+    });
+});
+
+// Gestion de la sélection d'argent
+document.querySelectorAll('.money-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Retirer la sélection précédente
+        document.querySelectorAll('.money-btn').forEach(b => b.classList.remove('active'));
+        
+        // Ajouter la sélection au bouton cliqué
+        this.classList.add('active');
+        
+        // Mettre à jour l'argent sélectionné
+        selectedMoney = parseInt(this.getAttribute('data-money'));
     });
 });
 
@@ -78,7 +93,8 @@ document.getElementById('btn-creer').addEventListener('click', function() {
         emoji: selectedEmoji,
         gameCode: gameCode,
         isHost: true,
-        skin: selectedSkin
+        skin: selectedSkin,
+        startingMoney: selectedMoney
     };
     
     localStorage.setItem('currentPlayer', JSON.stringify(player));
@@ -122,7 +138,8 @@ document.getElementById('btn-rejoindre').addEventListener('click', function() {
         emoji: selectedEmoji,
         gameCode: codePartie,
         isHost: false,
-        skin: selectedSkin
+        skin: selectedSkin,
+        startingMoney: selectedMoney
     };
     
     localStorage.setItem('currentPlayer', JSON.stringify(player));

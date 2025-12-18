@@ -29,11 +29,14 @@ let savedPlayers = JSON.parse(localStorage.getItem('gamePlayers')) || [
     }
 ];
 
+// Récupérer l'argent de départ choisi
+const startingMoney = currentPlayer.startingMoney || 1500;
+
 // Initialiser les joueurs avec l'argent et la position
 let players = savedPlayers.map(player => ({
     prenom: player.prenom,
     emoji: player.emoji,
-    money: 1500,
+    money: startingMoney,
     position: 0,
     isActive: true,
     isBot: player.isBot || false,
@@ -198,9 +201,8 @@ function rollDice() {
             // Déplacer le joueur
             movePlayer(currentPlayerIndex, total);
             
-            // Passer au joueur suivant après un délai
+            // Réinitialiser le diceRolling après un court délai
             setTimeout(() => {
-                nextPlayer();
                 diceRolling = false;
                 btn.disabled = false;
                 diceResult.innerHTML = '';
@@ -214,14 +216,19 @@ function movePlayer(playerIndex, steps) {
     const player = players[playerIndex];
     const startPosition = player.position;
     let newPosition = player.position + steps;
+    let passedStart = false;
     
     // Si on passe par la case départ (sans s'arrêter dessus)
     if (newPosition >= 40) {
         newPosition = newPosition % 40;
+        passedStart = true;
         
         // Afficher le dialog animé pour le passage par la case départ (+200€)
         setTimeout(() => {
-            showPassStartDialog(playerIndex);
+            showPassStartDialog(playerIndex, () => {
+                // Callback appelé après la fermeture du dialogue
+                checkLanding(playerIndex);
+            });
         }, 1000);
         
         // Messages des bots pour le passage à la case départ
@@ -291,7 +298,11 @@ function movePlayer(playerIndex, steps) {
             player.position = newPosition;
             displayTokens();
             displayPlayers();
-            checkLanding(playerIndex);
+            // Ne pas appeler checkLanding si on a passé par départ
+            // car il sera appelé après la fermeture du dialogue
+            if (!passedStart) {
+                checkLanding(playerIndex);
+            }
         }
     }, 200);
 }
@@ -861,7 +872,7 @@ function showStartBonusDialog(playerIndex) {
 }
 
 // Afficher le bonus pour passage par la case DÉPART (+200€) avec animation
-function showPassStartDialog(playerIndex) {
+function showPassStartDialog(playerIndex, onClose) {
     const player = players[playerIndex];
     
     // Créer un fond sombre avec effet
@@ -1022,16 +1033,16 @@ function showPassStartDialog(playerIndex) {
             setTimeout(() => {
                 dialog.remove();
                 overlay.remove();
+                
+                // Appeler le callback pour continuer le flux du jeu
+                if (onClose) {
+                    onClose();
+                }
             }, 300);
             
             player.money += 200;
             showFloatingMessage('+200€ PASSAGE!', 'success');
             displayPlayers();
-            
-            // Passer au joueur suivant
-            setTimeout(() => {
-                checkNextPlayer();
-            }, 1000);
         });
         
         // Si c'est un bot, cliquer automatiquement après 1.5 secondes
@@ -1048,7 +1059,15 @@ function drawCommunityCard(playerIndex) {
     const player = players[playerIndex];
     const card = communityCards[Math.floor(Math.random() * communityCards.length)];
     
-    showCardDialog(playerIndex, card, '📦 Caisse de Communauté');
+    if (player.isBot) {
+        // Pour les bots, juste afficher un message et appliquer l'effet
+        showNotification(`${player.emoji} ${player.prenom} tire une carte Caisse: ${card.text}`, 'success');
+        setTimeout(() => {
+            applyCardEffect(playerIndex, card);
+        }, 1500);
+    } else {
+        showCardDialog(playerIndex, card, '📦 Caisse de Communauté');
+    }
 }
 
 // Tirer une carte Chance
@@ -1056,7 +1075,15 @@ function drawChanceCard(playerIndex) {
     const player = players[playerIndex];
     const card = chanceCards[Math.floor(Math.random() * chanceCards.length)];
     
-    showCardDialog(playerIndex, card, '🎲 Chance');
+    if (player.isBot) {
+        // Pour les bots, juste afficher un message et appliquer l'effet
+        showNotification(`${player.emoji} ${player.prenom} tire une carte Chance: ${card.text}`, 'success');
+        setTimeout(() => {
+            applyCardEffect(playerIndex, card);
+        }, 1500);
+    } else {
+        showCardDialog(playerIndex, card, '🎲 Chance');
+    }
 }
 
 // Afficher la carte tirée avec animation améliorée
@@ -1282,6 +1309,9 @@ function applyCardEffect(playerIndex, card) {
         }
     }
     
+    // Variable pour savoir s'il faut appeler checkNextPlayer à la fin
+    let needsNextPlayer = true;
+    
     if (card.special) {
         switch (card.special) {
             case 'get-jail-card':
@@ -1296,7 +1326,13 @@ function applyCardEffect(playerIndex, card) {
                     player.jailTurns = players.length <= 3 ? 1 : 2;
                     displayTokens();
                     showNotification(`${player.emoji} ${player.prenom} va en prison pour ${player.jailTurns} tour(s)!`, 'error');
+                    
+                    // Passer au joueur suivant après être allé en prison
+                    if (player.isBot) {
+                        setTimeout(() => checkNextPlayer(), 1000);
+                    }
                 }, 500);
+                needsNextPlayer = false; // Déjà géré dans le setTimeout
                 break;
             case 'go-start':
                 setTimeout(() => {
@@ -1304,7 +1340,13 @@ function applyCardEffect(playerIndex, card) {
                     player.money += 200;
                     displayTokens();
                     showFloatingMessage('+200€ DÉPART', 'success');
+                    
+                    // Passer au joueur suivant
+                    if (player.isBot) {
+                        setTimeout(() => checkNextPlayer(), 1000);
+                    }
                 }, 500);
+                needsNextPlayer = false; // Déjà géré dans le setTimeout
                 break;
             case 'back-3':
                 setTimeout(() => {
@@ -1312,6 +1354,7 @@ function applyCardEffect(playerIndex, card) {
                     displayTokens();
                     checkLanding(playerIndex);
                 }, 500);
+                needsNextPlayer = false; // checkLanding gérera le passage
                 break;
             case 'go-39':
                 setTimeout(() => {
@@ -1319,6 +1362,7 @@ function applyCardEffect(playerIndex, card) {
                     displayTokens();
                     checkLanding(playerIndex);
                 }, 500);
+                needsNextPlayer = false; // checkLanding gérera le passage
                 break;
             case 'next-station':
                 const stations = [5, 15, 25, 35];
@@ -1332,11 +1376,19 @@ function applyCardEffect(playerIndex, card) {
                     displayTokens();
                     checkLanding(playerIndex);
                 }, 500);
+                needsNextPlayer = false; // checkLanding gérera le passage
                 break;
         }
     }
     
     displayPlayers();
+    
+    // Si c'est un bot et qu'on doit passer au joueur suivant
+    if (player.isBot && needsNextPlayer) {
+        setTimeout(() => {
+            checkNextPlayer();
+        }, 1500);
+    }
 }
 
 // Afficher une notification

@@ -620,3 +620,81 @@ body.skin-mecha {
     100% { transform: translateY(250px); }
 }
 
+/* ============================================
+   TRANSFORMATION DES ÉLÉMENTS BLANCS EN BLEU MECHA
+   ============================================ */
+
+/* Panneau d'actions style mecha */
+.skin-mecha .action-panel {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3), inset 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
+/* Paquets de cartes (Chance/Communauté) */
+.skin-mecha .card-deck {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4), 
+                inset 0 1px 0 rgba(0, 217, 255, 0.3);
+}
+
+/* Messages du chat - fond mecha */
+.skin-mecha .chat-messages {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+/* Input du chat style mecha */
+.skin-mecha .chat-input-container {
+    background: rgba(22, 33, 62, 0.8);
+    border-top: 2px solid #00d9ff;
+}
+
+/* Message "autre" dans le chat */
+.skin-mecha .chat-message.other {
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+}
+
+/* Cellules du plateau style mecha */
+.skin-mecha .cell {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+}
+
+.skin-mecha .cell:hover {
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border-color: #0affff;
+    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.5);
+}
+
+/* Cases spéciales style mecha */
+.skin-mecha .cell.special {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #ffbe0b;
+    box-shadow: 0 0 15px rgba(255, 190, 11, 0.4);
+}
+
+.skin-mecha .cell.station {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d9ff;
+}
+
+.skin-mecha .cell.utility {
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    border: 2px solid #0affff;
+}
+
+/* Noms et prix des cellules */
+.skin-mecha .cell-name {
+    color: #00d9ff;
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .cell-price {
+    color: #ffbe0b;
+    text-shadow: 0 0 5px rgba(255, 190, 11, 0.5);
+}
+
