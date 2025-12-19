@@ -328,6 +328,30 @@ h2 {
     margin-bottom: 5px;
 }
 
+/* Bouton supprimer bot */
+.delete-bot-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    opacity: 0.6;
+    padding: 5px;
+}
+
+.delete-bot-btn:hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.delete-bot-btn:active {
+    transform: scale(0.9);
+}
+
 .player-badge {
     display: inline-block;
     background: rgba(255, 255, 255, 0.3);
@@ -396,6 +420,88 @@ h2 {
     margin-top: 30px;
     position: relative;
     z-index: 1;
+}
+
+/* Sélecteur d'argent dans le lobby */
+.money-selector-section {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+.money-label {
+    display: block;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.money-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.money-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 15px 10px;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.money-btn::before {
+    content: '💰';
+    font-size: 1.1em;
+    opacity: 0.7;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.money-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
+    transform: translateY(-3px) scale(1.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 20px rgba(255, 193, 7, 0.3);
+}
+
+.money-btn:hover::before {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.money-btn.active {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border-color: #ffc107;
+    color: white;
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.6);
+}
+
+.money-btn.active::before {
+    animation: moneyBounce 1s ease-in-out infinite;
+}
+
+@keyframes moneyBounce {
+    0%, 100% { 
+        transform: translateY(0);
+    }
+    50% { 
+        transform: translateY(-3px);
+    }
 }
 
 .btn {

@@ -394,6 +394,19 @@ body.skin-mecha {
     filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.6));
 }
 
+/* Bouton supprimer bot style mecha */
+.skin-mecha .delete-bot-btn {
+    background: transparent;
+    border: none;
+    opacity: 0.7;
+    filter: drop-shadow(0 0 5px rgba(0, 217, 255, 0.5));
+}
+
+.skin-mecha .delete-bot-btn:hover {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 110, 0.8));
+}
+
 /* Boutons du lobby */
 .skin-mecha .btn-launch {
     background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);
@@ -430,6 +443,39 @@ body.skin-mecha {
 .skin-mecha .instructions {
     color: #00d9ff;
     opacity: 0.8;
+}
+
+/* Sélecteur d'argent style mecha */
+.skin-mecha .money-selector-section {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+.skin-mecha .money-label {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .money-btn {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(22, 33, 62, 0.5) 100%);
+    border: 2px solid #00d9ff;
+    color: #00d9ff;
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .money-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(22, 33, 62, 0.7) 100%);
+    border-color: #0affff;
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.5);
+}
+
+.skin-mecha .money-btn.active {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border-color: #ffc107;
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.6);
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* ============================================

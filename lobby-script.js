@@ -77,10 +77,40 @@ function displayPlayers() {
                 ${player.isHost ? '<span class="player-badge">👑 Hôte</span>' : ''}
                 ${player.isBot ? '<span class="player-badge bot-badge">🤖 Bot</span>' : ''}
             </div>
+            ${player.isBot && currentPlayer.isHost ? '<button class="delete-bot-btn" data-index="' + index + '">🗑️</button>' : ''}
         `;
         
         playersList.appendChild(playerCard);
     });
+    
+    // Ajouter les gestionnaires d'événements pour les boutons de suppression
+    if (currentPlayer.isHost) {
+        document.querySelectorAll('.delete-bot-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const botIndex = parseInt(this.getAttribute('data-index'));
+                const bot = players[botIndex];
+                
+                if (confirm(`Voulez-vous vraiment supprimer ${bot.emoji} ${bot.prenom} ?`)) {
+                    // Retirer le bot de la liste
+                    players.splice(botIndex, 1);
+                    
+                    // Retirer des listes d'utilisation
+                    usedBotNames = usedBotNames.filter(name => name !== bot.prenom);
+                    usedBotEmojis = usedBotEmojis.filter(emoji => emoji !== bot.emoji);
+                    
+                    // Mettre à jour localStorage
+                    const botsToSave = players.filter(p => p.isBot).map(p => ({
+                        name: p.prenom,
+                        emoji: p.emoji
+                    }));
+                    localStorage.setItem('gameBots', JSON.stringify(botsToSave));
+                    
+                    displayPlayers();
+                    showMessage(`✅ ${bot.emoji} ${bot.prenom} supprimé !`, 'success');
+                }
+            });
+        });
+    }
 }
 
 // Afficher les joueurs initiaux
@@ -90,8 +120,28 @@ displayPlayers();
 if (currentPlayer.isHost) {
     document.getElementById('btn-start').style.display = 'block';
     document.getElementById('btn-add-bot').style.display = 'block';
-    document.getElementById('btn-remove-bots').style.display = 'block';
+    document.querySelector('.money-selector-section').style.display = 'block';
 }
+
+// Gestion de la sélection d'argent
+let selectedMoney = currentPlayer.startingMoney || 1500;
+
+document.querySelectorAll('.money-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Retirer la sélection précédente
+        document.querySelectorAll('.money-btn').forEach(b => b.classList.remove('active'));
+        
+        // Ajouter la sélection au bouton cliqué
+        this.classList.add('active');
+        
+        // Mettre à jour l'argent sélectionné
+        selectedMoney = parseInt(this.getAttribute('data-money'));
+        
+        // Mettre à jour dans localStorage
+        currentPlayer.startingMoney = selectedMoney;
+        localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
+    });
+});
 
 // Fonction pour obtenir un nom de bot aléatoire non utilisé
 function getRandomBotName() {
@@ -146,23 +196,7 @@ document.getElementById('btn-add-bot').addEventListener('click', function() {
     showMessage(`✅ ${newBot.emoji} ${newBot.prenom} ajouté !`, 'success');
 });
 
-// Bouton Supprimer les bots
-document.getElementById('btn-remove-bots').addEventListener('click', function() {
-    const botCount = players.filter(p => p.isBot).length;
-    
-    if (botCount === 0) {
-        showMessage('⚠️ Aucun bot à supprimer', 'error');
-        return;
-    }
-    
-    if (confirm(`Voulez-vous vraiment supprimer tous les bots (${botCount}) ?`)) {
-        players = players.filter(p => !p.isBot);
-        usedBotNames = [];
-        localStorage.removeItem('gameBots');
-        displayPlayers();
-        showMessage('✅ Tous les bots ont été supprimés', 'success');
-    }
-});
+
 
 // Fonction pour afficher un message
 function showMessage(text, type) {

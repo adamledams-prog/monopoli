@@ -53,6 +53,31 @@ let diceRolling = false;
 // Seuils d'alerte pour l'argent
 const moneyAlertThresholds = [1200, 1000, 700, 500, 200];
 
+// Messages automatiques des bots toutes les 20 secondes
+const botAutoMessages = [
+    "🤖 C'est les bots qui vont gagner !",
+    "😏 Les humains sont nuls !",
+    "💪 On est trop forts !",
+    "🎯 Aucune chance face à nous !",
+    "🏆 La victoire sera pour les bots !",
+    "😎 Vous n'avez aucune chance !",
+    "🤓 Notre intelligence artificielle domine !",
+    "⚡ Les bots sont imbattables !"
+];
+
+// Fonction pour envoyer un message automatique des bots
+function sendBotAutoMessage() {
+    const bots = players.filter(p => p.isBot);
+    if (bots.length > 0) {
+        const randomBot = bots[Math.floor(Math.random() * bots.length)];
+        const randomMessage = botAutoMessages[Math.floor(Math.random() * botAutoMessages.length)];
+        addChatMessage(randomMessage, randomBot.prenom, false, true);
+    }
+}
+
+// Démarrer les messages automatiques des bots toutes les 20 secondes
+setInterval(sendBotAutoMessage, 20000);
+
 // Fonction pour vérifier et envoyer une alerte d'argent
 function checkMoneyAlert(player) {
     for (let threshold of moneyAlertThresholds) {
@@ -374,12 +399,27 @@ function checkLanding(playerIndex) {
         }, 2000);
     } else if (position === 30) {
         // Déterminer le nombre de tours en prison selon le nombre de joueurs
-        const jailTurns = players.length <= 3 ? 1 : 2;
+        const jailTurns = players.length <= 3 ? 2 : 3;
         player.inJail = true;
         player.jailTurns = jailTurns;
         
         showNotification(`${player.emoji} ${player.prenom} va en prison pour ${jailTurns} tour(s)!`, 'error');
         showFloatingMessage(`🚔 EN PRISON ${jailTurns} TOUR(S)!`, 'error');
+        
+        // Message du bot s'il va en prison
+        if (player.isBot) {
+            setTimeout(() => {
+                const jailMessages = [
+                    `😱 Non je suis en prison !`,
+                    `😭 Noooon pas la prison !`,
+                    `🚔 C'est pas juste !`,
+                    `😡 Je vais sortir et me venger !`
+                ];
+                const randomMessage = jailMessages[Math.floor(Math.random() * jailMessages.length)];
+                addChatMessage(randomMessage, player.prenom, false, true);
+            }, 500);
+        }
+        
         setTimeout(() => {
             player.position = 10;
             displayTokens();
@@ -627,6 +667,7 @@ const communityCards = [
 const chanceCards = [
     { text: "Avancez jusqu'à la case DÉPART, recevez 200€", amount: 200, type: 'success', special: 'go-start' },
     { text: "La banque vous verse un dividende de 50€", amount: 50, type: 'success' },
+    { text: "C'est votre anniversaire, gagnez 50€", amount: 50, type: 'success' },
     { text: "Amende pour ivresse, payez 20€", amount: -20, type: 'error' },
     { text: "Faites des réparations dans toutes vos maisons, payez 25€", amount: -25, type: 'error' },
     { text: "Faites des réparations dans tous vos hôtels, payez 100€", amount: -100, type: 'error' },
@@ -1059,6 +1100,34 @@ function drawCommunityCard(playerIndex) {
     const player = players[playerIndex];
     const card = communityCards[Math.floor(Math.random() * communityCards.length)];
     
+    // Messages des bots quand quelqu'un tire une carte
+    setTimeout(() => {
+        const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
+        if (otherBots.length > 0) {
+            const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
+            let message = '';
+            
+            if (player.isBot) {
+                const messages = [
+                    `🎲 La chance va tourner pour ${player.prenom} !`,
+                    `📦 Voyons ce que ça donne...`,
+                    `🤞 Espérons que c'est bon !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            } else {
+                const messages = [
+                    `🙏 On espère que t'as pas de chance ${player.prenom} !`,
+                    `😏 Attention, qu'est-ce qui va arriver ?`,
+                    `🎲 Voyons voir ta chance ${player.prenom}...`,
+                    `👀 J'espère que c'est pas bon pour toi !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            
+            addChatMessage(message, randomBot.prenom, false, true);
+        }
+    }, 300);
+    
     if (player.isBot) {
         // Pour les bots, juste afficher un message et appliquer l'effet
         showNotification(`${player.emoji} ${player.prenom} tire une carte Caisse: ${card.text}`, 'success');
@@ -1074,6 +1143,35 @@ function drawCommunityCard(playerIndex) {
 function drawChanceCard(playerIndex) {
     const player = players[playerIndex];
     const card = chanceCards[Math.floor(Math.random() * chanceCards.length)];
+    
+    // Messages des bots quand quelqu'un tire une carte Chance
+    setTimeout(() => {
+        const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
+        if (otherBots.length > 0) {
+            const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
+            let message = '';
+            
+            if (player.isBot) {
+                const messages = [
+                    `✨ La chance va sourire à ${player.prenom} !`,
+                    `🎲 Voyons ce que le destin réserve...`,
+                    `🍀 J'espère que c'est une bonne carte !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            } else {
+                const messages = [
+                    `😈 On espère que t'as pas de chance ${player.prenom} !`,
+                    `⚠️ Attention, qu'est-ce qui va avoir ?`,
+                    `🎲 La chance d'avoir une carte Chance ${player.prenom}...`,
+                    `👀 Ça va être intéressant !`,
+                    `🙏 Pourvu que ce soit mauvais pour toi !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            
+            addChatMessage(message, randomBot.prenom, false, true);
+        }
+    }, 300);
     
     if (player.isBot) {
         // Pour les bots, juste afficher un message et appliquer l'effet
@@ -1300,6 +1398,56 @@ function showCardDialog(playerIndex, card, title) {
 function applyCardEffect(playerIndex, card) {
     const player = players[playerIndex];
     
+    // Réactions des bots selon le type de carte
+    setTimeout(() => {
+        const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
+        if (otherBots.length > 0) {
+            const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
+            let message = '';
+            
+            // Cartes avec gains d'argent importants (150€+)
+            if (card.amount >= 150) {
+                const messages = [
+                    `😱 Ouah la chance ${player.prenom} !`,
+                    `💰 Trop chanceux ${player.prenom} !`,
+                    `🤑 C'est injuste cette chance !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            // Cartes avec pertes d'argent
+            else if (card.amount < 0) {
+                const messages = [
+                    `😂 Pas de chance ${player.prenom} !`,
+                    `🤣 Dommage pour toi !`,
+                    `😏 Bien fait !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            // Carte sortie de prison
+            else if (card.special === 'get-jail-card') {
+                const messages = [
+                    `🎫 On verra si ${player.prenom} sera un jour en prison !`,
+                    `👀 Cette carte va lui servir...`,
+                    `😏 Garde-la bien ${player.prenom} !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            // Cartes de déplacement nul (back-3, go-39, next-station)
+            else if (card.special === 'back-3' || card.special === 'go-39' || card.special === 'next-station') {
+                const messages = [
+                    `😑 Nul cette carte !`,
+                    `🤷 Ça sert à rien...`,
+                    `😒 Carte inutile !`
+                ];
+                message = messages[Math.floor(Math.random() * messages.length)];
+            }
+            
+            if (message) {
+                addChatMessage(message, randomBot.prenom, false, true);
+            }
+        }
+    }, 800);
+    
     if (card.amount !== 0) {
         player.money += card.amount;
         if (card.amount > 0) {
@@ -1323,9 +1471,23 @@ function applyCardEffect(playerIndex, card) {
                 setTimeout(() => {
                     player.position = 10;
                     player.inJail = true;
-                    player.jailTurns = players.length <= 3 ? 1 : 2;
+                    player.jailTurns = players.length <= 3 ? 2 : 3;
                     displayTokens();
                     showNotification(`${player.emoji} ${player.prenom} va en prison pour ${player.jailTurns} tour(s)!`, 'error');
+                    
+                    // Message du bot s'il va en prison
+                    if (player.isBot) {
+                        setTimeout(() => {
+                            const jailMessages = [
+                                `😱 Non je suis en prison !`,
+                                `😭 Noooon pas la prison !`,
+                                `🚔 C'est pas juste !`,
+                                `😡 Je vais sortir et me venger !`
+                            ];
+                            const randomMessage = jailMessages[Math.floor(Math.random() * jailMessages.length)];
+                            addChatMessage(randomMessage, player.prenom, false, true);
+                        }, 300);
+                    }
                     
                     // Passer au joueur suivant après être allé en prison
                     if (player.isBot) {
