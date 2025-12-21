@@ -12,6 +12,7 @@ body {
     min-height: 100vh;
     padding: 20px;
     overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
 }
 
@@ -1377,4 +1378,88 @@ body::after {
     .center-logo {
         font-size: 2em;
     }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+@keyframes chickenFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.9;
+    }
+}
+
+.chicken-overlay {
+    pointer-events: none !important;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes titlePulse {
+    0%, 100% { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(255, 140, 0, 0.7); }
+    50% { box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 70px rgba(255, 140, 0, 1); }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes explode0 {
+    to { transform: translate(40px, -40px); opacity: 0; }
+}
+
+@keyframes explode1 {
+    to { transform: translate(50px, 0); opacity: 0; }
+}
+
+@keyframes explode2 {
+    to { transform: translate(40px, 40px); opacity: 0; }
+}
+
+@keyframes explode3 {
+    to { transform: translate(0, 50px); opacity: 0; }
+}
+
+@keyframes explode4 {
+    to { transform: translate(-40px, 40px); opacity: 0; }
+}
+
+@keyframes explode5 {
+    to { transform: translate(-50px, 0); opacity: 0; }
+}
+
+@keyframes explode6 {
+    to { transform: translate(-40px, -40px); opacity: 0; }
+}
+
+@keyframes explode7 {
+    to { transform: translate(0, -50px); opacity: 0; }
 }

@@ -1010,7 +1010,7 @@ function showPassStartDialog(playerIndex, onClose) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: linear-gradient(135deg, rgba(22, 33, 62, 0.98) 0%, rgba(26, 26, 46, 0.98) 100%);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(17, 153, 142, 0.4);
@@ -1025,13 +1025,10 @@ function showPassStartDialog(playerIndex, onClose) {
         dialog.innerHTML = `
             <div style="font-size: 5em; margin-bottom: 20px; animation: bounce 0.8s ease infinite; filter: drop-shadow(0 0 15px rgba(17,153,142,0.8));">🏁</div>
             <h2 style="
-                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                color: #00d9ff;
                 margin-bottom: 20px;
                 font-size: 2.5em;
-                text-shadow: 0 0 20px rgba(17, 153, 142, 0.4);
+                text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
                 font-weight: 800;
                 letter-spacing: 2px;
             ">PASSAGE RÉUSSI!</h2>
@@ -1331,7 +1328,7 @@ function showCardDialog(playerIndex, card, title) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotateY(90deg) scale(0.5);
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: linear-gradient(135deg, rgba(22, 33, 62, 0.98) 0%, rgba(26, 26, 46, 0.98) 100%);
             padding: 50px;
             border-radius: 25px;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 50px ${card.type === 'success' ? 'rgba(17, 153, 142, 0.5)' : card.type === 'error' ? 'rgba(238, 9, 121, 0.5)' : 'rgba(102, 126, 234, 0.5)'};
@@ -1346,7 +1343,7 @@ function showCardDialog(playerIndex, card, title) {
         const cardIcon = isChance ? '🎲' : '📦';
         dialog.innerHTML = `
             <div style="font-size: 4em; margin-bottom: 20px; animation: bounce 1s ease infinite;">${cardIcon}</div>
-            <h2 style="color: ${card.type === 'success' ? '#11998e' : card.type === 'error' ? '#ee0979' : '#667eea'}; margin-bottom: 25px; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">${title}</h2>
+            <h2 style="color: ${card.type === 'success' ? '#00d9ff' : card.type === 'error' ? '#ff006e' : '#00d9ff'}; margin-bottom: 25px; font-size: 2.5em; text-shadow: 0 0 20px ${card.type === 'success' ? 'rgba(0, 217, 255, 0.8)' : card.type === 'error' ? 'rgba(255, 0, 110, 0.8)' : 'rgba(0, 217, 255, 0.8)'};">${title}</h2>
             <div style="
                 background: ${card.type === 'success' ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' : card.type === 'error' ? 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
                 color: white;
@@ -1981,10 +1978,998 @@ function showPropertyManagementDialog(position, cell) {
     });
 }
 
+// Événement "Poulet" - Se déclenche entre 1 et 2 minutes
+function scheduleChickenEvent() {
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60000ms (1min) et 120000ms (2min)
+    
+    setTimeout(() => {
+        triggerChickenEvent();
+    }, delay);
+}
+
+function triggerChickenEvent() {
+    // Créer l'overlay qui bloque les clics
+    const overlay = document.createElement('div');
+    overlay.className = 'chicken-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 140, 0, 0) 0%, rgba(255, 69, 0, 0) 100%);
+        z-index: 9999;
+        transition: all 0.8s ease;
+        pointer-events: all;
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.style.background = 'linear-gradient(135deg, rgba(255, 140, 0, 0.4) 0%, rgba(255, 69, 0, 0.3) 100%)', 50);
+    
+    // Afficher le titre
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = `
+        position: fixed;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        background: linear-gradient(135deg, #ff8c00 0%, #ff4500 100%);
+        padding: 35px 70px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(255, 140, 0, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        z-index: 10001;
+        text-align: center;
+        border: 5px solid #ffd700;
+        transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        pointer-events: none;
+        animation: titlePulse 2s ease infinite;
+    `;
+    titleDiv.innerHTML = `
+        <div style="font-size: 5em; margin-bottom: 15px; animation: bounce 0.8s ease infinite; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));">🐔</div>
+        <h2 style="
+            color: #fff;
+            margin: 0;
+            font-size: 3em;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+            font-weight: 900;
+            letter-spacing: 4px;
+        ">ATTRAPEZ LES POULETS !</h2>
+        <div style="
+            color: #ffd700;
+            font-size: 1.5em;
+            margin-top: 15px;
+            font-weight: 700;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
+        ">🐔 Cliquez rapidement = +10€ par poulet !</div>
+    `;
+    document.body.appendChild(titleDiv);
+    setTimeout(() => titleDiv.style.transform = 'translate(-50%, -50%) scale(1)', 100);
+    
+    // Compteur en temps réel
+    const scoreDiv = document.createElement('div');
+    scoreDiv.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        background: linear-gradient(135deg, rgba(255, 140, 0, 0.95) 0%, rgba(255, 69, 0, 0.95) 100%);
+        padding: 20px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.6);
+        z-index: 10001;
+        text-align: center;
+        border: 3px solid #ffd700;
+        pointer-events: none;
+        font-size: 1.8em;
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    `;
+    scoreDiv.innerHTML = `
+        <div style="font-size: 0.8em; color: #ffd700; margin-bottom: 5px;">SCORE</div>
+        <div id="chicken-score" style="font-size: 2em; color: #00ff00;">0€</div>
+    `;
+    document.body.appendChild(scoreDiv);
+    
+    // Compteur de poulets attrapés et argent gagné par joueur
+    const chickenCaught = {};
+    const moneyEarned = {};
+    let totalMoney = 0;
+    players.forEach((player, index) => {
+        chickenCaught[index] = 0;
+        moneyEarned[index] = 0;
+    });
+    
+    // Créer des étoiles de fond
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.textContent = ['⭐', '✨', '💫', '🌟'][Math.floor(Math.random() * 4)];
+            star.style.cssText = `
+                position: fixed;
+                left: ${Math.random() * window.innerWidth}px;
+                top: ${Math.random() * window.innerHeight}px;
+                font-size: ${Math.random() * 1.5 + 0.5}em;
+                z-index: 9998;
+                pointer-events: none;
+                animation: twinkle ${Math.random() * 2 + 1}s ease infinite;
+                opacity: ${Math.random() * 0.5 + 0.3};
+            `;
+            overlay.appendChild(star);
+        }, i * 100);
+    }
+    
+    // Attendre 2 secondes avant de faire tomber les poulets
+    setTimeout(() => {
+        // Masquer le titre
+        titleDiv.style.top = '5%';
+        titleDiv.style.transform = 'translate(-50%, 0) scale(0.7)';
+        
+        // Créer et faire tomber 60 poulets
+        const totalChickens = 60;
+        const chickensCreated = [];
+        
+        for (let i = 0; i < totalChickens; i++) {
+            setTimeout(() => {
+                const chicken = document.createElement('div');
+                chicken.textContent = '🐔';
+                const randomSpeed = Math.random() * 2 + 2.5;
+                chicken.style.cssText = `
+                    position: fixed;
+                    left: ${Math.random() * (window.innerWidth - 60)}px;
+                    top: -60px;
+                    font-size: ${Math.random() * 2 + 1.5}em;
+                    z-index: 10000;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                    user-select: none;
+                    animation: chickenFall ${randomSpeed}s linear;
+                    pointer-events: all;
+                    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+                `;
+                
+                // Gestion du clic sur le poulet
+                chicken.addEventListener('click', function(e) {
+                    if (!this.clicked) {
+                        this.clicked = true;
+                        
+                        // Trouver le joueur actuel
+                        const currentIndex = currentPlayerIndex;
+                        chickenCaught[currentIndex]++;
+                        moneyEarned[currentIndex] += 10;
+                        totalMoney += 10;
+                        
+                        // Mettre à jour le score
+                        const scoreElement = document.getElementById('chicken-score');
+                        if (scoreElement) {
+                            scoreElement.textContent = totalMoney + '€';
+                            scoreElement.style.transform = 'scale(1.3)';
+                            setTimeout(() => scoreElement.style.transform = 'scale(1)', 200);
+                        }
+                        
+                        // Ajouter l'argent
+                        players[currentIndex].money += 10;
+                        displayPlayers();
+                        
+                        // Créer l'animation "+10€" à l'endroit du clic avec effet combo
+                        const plusTen = document.createElement('div');
+                        plusTen.textContent = '+10€';
+                        plusTen.style.cssText = `
+                            position: fixed;
+                            left: ${e.clientX}px;
+                            top: ${e.clientY}px;
+                            color: #00ff00;
+                            font-size: 2.5em;
+                            font-weight: 900;
+                            text-shadow: 0 0 20px rgba(0, 255, 0, 1), 0 0 40px rgba(0, 255, 0, 0.5);
+                            z-index: 10002;
+                            pointer-events: none;
+                            animation: floatUp 1.2s ease forwards;
+                        `;
+                        document.body.appendChild(plusTen);
+                        
+                        // Créer des particules d'explosion
+                        for (let j = 0; j < 8; j++) {
+                            const particle = document.createElement('div');
+                            particle.textContent = ['💰', '✨', '⭐', '💫'][Math.floor(Math.random() * 4)];
+                            particle.style.cssText = `
+                                position: fixed;
+                                left: ${e.clientX}px;
+                                top: ${e.clientY}px;
+                                font-size: 1.5em;
+                                z-index: 10002;
+                                pointer-events: none;
+                                animation: explode${j} 0.8s ease forwards;
+                            `;
+                            document.body.appendChild(particle);
+                            setTimeout(() => particle.remove(), 800);
+                        }
+                        
+                        // Supprimer le "+10€" après l'animation
+                        setTimeout(() => plusTen.remove(), 1200);
+                        
+                        // Faire disparaître le poulet avec effet
+                        this.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                        this.style.transform = 'scale(2) rotate(720deg)';
+                        this.style.opacity = '0';
+                        
+                        setTimeout(() => this.remove(), 400);
+                    }
+                });
+                
+                chicken.addEventListener('mouseover', function() {
+                    if (!this.clicked) {
+                        this.style.transform = 'scale(1.4) rotate(15deg)';
+                        this.style.filter = 'drop-shadow(0 8px 15px rgba(255, 140, 0, 0.8))';
+                    }
+                });
+                
+                chicken.addEventListener('mouseout', function() {
+                    if (!this.clicked) {
+                        this.style.transform = 'scale(1) rotate(0deg)';
+                        this.style.filter = 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5))';
+                    }
+                });
+                
+                document.body.appendChild(chicken);
+                chickensCreated.push(chicken);
+                
+                // Supprimer le poulet après l'animation
+                setTimeout(() => {
+                    if (!chicken.clicked) {
+                        chicken.remove();
+                    }
+                }, randomSpeed * 1000 + 500);
+            }, i * 120); // Un poulet tous les 120ms
+        }
+    }, 2000); // Attendre 2 secondes
+    
+    // Nettoyer après 19 secondes (2s attente + 17s événement)
+    setTimeout(() => {
+        titleDiv.style.transform = 'translate(-50%, 0) scale(0)';
+        scoreDiv.style.transform = 'scale(0)';
+        
+        // Afficher le récapitulatif
+        setTimeout(() => {
+            titleDiv.remove();
+            scoreDiv.remove();
+            
+            // Créer le message récapitulatif avec style amélioré
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.5);
+                background: linear-gradient(135deg, #ff8c00 0%, #ff4500 50%, #ff6347 100%);
+                padding: 50px 80px;
+                border-radius: 30px;
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 140, 0, 0.8), inset 0 0 50px rgba(255, 255, 255, 0.2);
+                z-index: 10001;
+                text-align: center;
+                border: 6px solid #ffd700;
+                transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                pointer-events: none;
+                max-width: 700px;
+            `;
+            
+            let summaryHTML = `
+                <div style="font-size: 4em; margin-bottom: 20px; animation: bounce 1s ease infinite; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));">🎉</div>
+                <h2 style="
+                    color: #fff; 
+                    margin-bottom: 35px; 
+                    font-size: 2.8em; 
+                    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
+                    font-weight: 900;
+                    letter-spacing: 3px;
+                ">RÉSULTATS FINAUX</h2>
+            `;
+            
+            // Trier les joueurs par argent gagné
+            const sortedPlayers = players.map((player, index) => ({
+                player,
+                index,
+                caught: chickenCaught[index],
+                earned: moneyEarned[index]
+            })).filter(p => p.earned > 0).sort((a, b) => b.earned - a.earned);
+            
+            sortedPlayers.forEach((data, rank) => {
+                const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🏅';
+                summaryHTML += `
+                    <div style="
+                        margin: 20px 0;
+                        padding: 20px 30px;
+                        background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+                        border-radius: 20px;
+                        color: #fff;
+                        font-size: 1.4em;
+                        font-weight: 700;
+                        border: 3px solid rgba(255, 215, 0, ${rank === 0 ? 1 : 0.5});
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+                        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+                        animation: slideIn ${0.3 + rank * 0.1}s ease forwards;
+                    ">
+                        ${medal} ${data.player.emoji} <strong>${data.player.prenom}</strong><br>
+                        <span style="color: #00ff00; font-size: 1.1em;">${data.caught} poulets 🐔</span> 
+                        = 
+                        <span style="color: #ffd700; font-size: 1.3em; text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);">+${data.earned}€ 💰</span>
+                    </div>
+                `;
+            });
+            
+            if (sortedPlayers.length === 0) {
+                summaryHTML += `
+                    <div style="color: #fff; font-size: 1.5em; margin: 20px 0;">
+                        Aucun poulet attrapé... 😢
+                    </div>
+                `;
+            }
+            
+            summaryDiv.innerHTML = summaryHTML;
+            document.body.appendChild(summaryDiv);
+            setTimeout(() => summaryDiv.style.transform = 'translate(-50%, -50%) scale(1)', 100);
+            
+            // Fermer après 4 secondes
+            setTimeout(() => {
+                summaryDiv.style.transform = 'translate(-50%, -50%) scale(0)';
+                overlay.style.background = 'rgba(255, 140, 0, 0)';
+                
+                setTimeout(() => {
+                    summaryDiv.remove();
+                    overlay.remove();
+                    
+                    // Messages dans le chat
+                    sortedPlayers.forEach((data) => {
+                        addChatMessage(`🐔 ${data.player.emoji} ${data.player.prenom} a attrapé ${data.caught} poulet(s) et gagné ${data.earned}€ !`, 'Système', true, false);
+                    });
+                }, 500);
+            }, 4000);
+        }, 500);
+    }, 19000);
+}
+
+// Événement "Noël" - Se déclenche entre 1 et 2 minutes
+function scheduleChristmasEvent() {
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60000ms (1min) et 120000ms (2min)
+    
+    setTimeout(() => {
+        triggerChristmasEvent();
+    }, delay);
+}
+
+function triggerChristmasEvent() {
+    // Créer l'overlay de Noël
+    const overlay = document.createElement('div');
+    overlay.className = 'christmas-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 50, 10, 0);
+        z-index: 9999;
+        transition: background 0.8s ease;
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+        overlay.style.background = 'rgba(10, 50, 10, 0.85)';
+    }, 50);
+    
+    // Créer des flocons de neige
+    for (let i = 0; i < 100; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.textContent = '❄️';
+        snowflake.style.cssText = `
+            position: fixed;
+            left: ${Math.random() * window.innerWidth}px;
+            top: -20px;
+            font-size: ${Math.random() * 1.5 + 0.5}em;
+            z-index: 2999;
+            animation: snowFall ${Math.random() * 3 + 2}s linear infinite;
+            pointer-events: none;
+            opacity: ${Math.random() * 0.7 + 0.3};
+        `;
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 15000);
+    }
+    
+    // Afficher les cadeaux joueur par joueur
+    showPlayerChristmasGifts(0, overlay);
+}
+
+function showPlayerChristmasGifts(playerIndex, overlay) {
+    if (playerIndex >= players.length) {
+        // Tous les joueurs ont ouvert leurs cadeaux
+        overlay.style.background = 'rgba(0, 0, 0, 0)';
+        setTimeout(() => overlay.remove(), 500);
+        return;
+    }
+    
+    const player = players[playerIndex];
+    
+    // Message de Noël pour ce joueur
+    const christmasMessage = document.createElement('div');
+    christmasMessage.className = 'christmas-dialog';
+    christmasMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        background: linear-gradient(135deg, #1a4d1a 0%, #0d260d 100%);
+        padding: 50px 70px;
+        border-radius: 30px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 100, 100, 0.5);
+        z-index: 10000;
+        text-align: center;
+        border: 4px solid #d4af37;
+        transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        max-width: 900px;
+        backdrop-filter: none;
+        filter: none;
+    `;
+    
+    // Créer 6 cadeaux
+    let giftsHTML = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">';
+    for (let i = 0; i < 6; i++) {
+        giftsHTML += `
+            <button class="gift-choice-btn" data-gift-index="${i}" style="
+                font-size: 5em;
+                background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+                border: 3px solid #d4af37;
+                border-radius: 20px;
+                padding: 30px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+            " onmouseover="this.style.transform='scale(1.15) rotate(5deg)'; this.style.borderColor='#ffd700'" onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.borderColor='#d4af37'">🎁</button>
+        `;
+    }
+    giftsHTML += '</div>';
+    
+    christmasMessage.innerHTML = `
+        <div style="font-size: 5em; margin-bottom: 20px; animation: bounce 1s ease infinite;">🎄</div>
+        <h2 style="
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-size: 3em;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            font-weight: 900;
+            letter-spacing: 4px;
+        ">JOYEUX NOËL ! 🎅</h2>
+        <div style="
+            color: #90ee90;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        ">
+            <span style="font-size: 2em;">${player.emoji}</span> ${player.prenom}
+        </div>
+        <div style="
+            color: #ffbe0b;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        ">
+            🎁 Choisissez UN cadeau parmi les 6 !
+        </div>
+        ${giftsHTML}
+    `;
+    
+    document.body.appendChild(christmasMessage);
+    setTimeout(() => christmasMessage.style.transform = 'translate(-50%, -50%) scale(1)', 100);
+    
+    // Gestion des clics sur les cadeaux
+    document.querySelectorAll('.gift-choice-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Désactiver tous les boutons
+            document.querySelectorAll('.gift-choice-btn').forEach(b => {
+                b.disabled = true;
+                b.style.cursor = 'not-allowed';
+            });
+            
+            // Animation du cadeau choisi
+            this.style.transform = 'scale(1.3) rotate(360deg)';
+            
+            // Faire disparaître tous les cadeaux avec animation
+            setTimeout(() => {
+                const giftsGrid = this.parentElement;
+                giftsGrid.style.transition = 'all 0.5s ease';
+                giftsGrid.style.opacity = '0';
+                giftsGrid.style.transform = 'scale(0.5)';
+                
+                setTimeout(() => {
+                    giftsGrid.remove();
+                    
+                    // Ouvrir le cadeau et afficher la récompense
+                    openChristmasGift(playerIndex, this, christmasMessage);
+                    
+                    // Passer au joueur suivant après 3 secondes
+                    setTimeout(() => {
+                        christmasMessage.style.transform = 'translate(-50%, -50%) scale(0)';
+                        setTimeout(() => {
+                            christmasMessage.remove();
+                            showPlayerChristmasGifts(playerIndex + 1, overlay);
+                        }, 500);
+                    }, 3000);
+                }, 500);
+            }, 800);
+        });
+    });
+    
+    // Si c'est un bot, choisir automatiquement après un délai
+    if (player.isBot) {
+        setTimeout(() => {
+            const randomGift = Math.floor(Math.random() * 6);
+            const btn = document.querySelector(`.gift-choice-btn[data-gift-index="${randomGift}"]`);
+            if (btn && !btn.disabled) {
+                btn.click();
+            }
+        }, 1500);
+    }
+}
+
+function openChristmasGift(playerIndex, btnElement, messageElement) {
+    const player = players[playerIndex];
+    
+    // Types de récompenses
+    const rewards = [
+        { type: 'money', weight: 35 },
+        { type: 'jail-card', weight: 15 },
+        { type: 'teleport', weight: 20 },
+        { type: 'chance-good', weight: 20 },
+        { type: 'ultimate', weight: 10 }
+    ];
+    
+    // Sélection aléatoire pondérée
+    const totalWeight = rewards.reduce((sum, r) => sum + r.weight, 0);
+    let random = Math.random() * totalWeight;
+    let selectedReward = rewards[0];
+    
+    for (let reward of rewards) {
+        random -= reward.weight;
+        if (random <= 0) {
+            selectedReward = reward;
+            break;
+        }
+    }
+    
+    // Appliquer la récompense
+    let rewardText = '';
+    let rewardEmoji = '🎁';
+    
+    switch (selectedReward.type) {
+        case 'money':
+            const amount = Math.floor(Math.random() * 61) + 40; // 40-100€
+            player.money += amount;
+            rewardText = `Vous avez gagné ${amount}€ !`;
+            rewardEmoji = '💰';
+            showFloatingMessage(`${player.emoji} +${amount}€`, 'success');
+            break;
+            
+        case 'jail-card':
+            player.jailFreeCards++;
+            rewardText = 'Carte Sortie de Prison';
+            rewardEmoji = '🎫';
+            showFloatingMessage(`${player.emoji} 🎫 CARTE PRISON`, 'success');
+            break;
+            
+        case 'teleport':
+            // Cases entre 13 et 19 (Rue de Paradis à Place Pigalle)
+            const teleportPositions = [13, 14, 16, 18, 19];
+            const newPosition = teleportPositions[Math.floor(Math.random() * teleportPositions.length)];
+            const oldPosition = player.position;
+            player.position = newPosition;
+            displayTokens();
+            rewardText = 'Téléportation magique !';
+            rewardEmoji = '✨';
+            showFloatingMessage(`${player.emoji} ✨ TÉLÉPORTATION`, 'info');
+            setTimeout(() => checkLanding(playerIndex), 1000);
+            break;
+            
+        case 'chance-good':
+            // Cartes Chance positives uniquement
+            const goodChanceCards = [
+                { text: "La banque vous verse un dividende de 50€", amount: 50 },
+                { text: "C'est votre anniversaire, gagnez 50€", amount: 50 },
+                { text: "Votre immeuble rapporte des revenus, recevez 150€", amount: 150 },
+                { text: "Votre prêt de construction échoit, recevez 150€", amount: 150 }
+            ];
+            const card = goodChanceCards[Math.floor(Math.random() * goodChanceCards.length)];
+            player.money += card.amount;
+            rewardText = card.text;
+            rewardEmoji = '🎲';
+            showFloatingMessage(`${player.emoji} +${card.amount}€`, 'success');
+            break;
+            
+        case 'ultimate':
+            rewardText = 'Carte ULTIME : Volez 50€ à un adversaire !';
+            rewardEmoji = '⚡';
+            // Pour les bots, choisir automatiquement
+            if (player.isBot) {
+                setTimeout(() => {
+                    const victims = players.filter((p, i) => i !== playerIndex);
+                    const victim = victims[Math.floor(Math.random() * victims.length)];
+                    victim.money -= 50;
+                    displayPlayers();
+                    showFloatingMessage(`${victim.emoji} -50€ PAR ${player.emoji}`, 'error');
+                    addChatMessage(`${player.emoji} ${player.prenom} a utilisé la carte ULTIME sur ${victim.emoji} ${victim.prenom} ! -50€`, 'Système', true, false);
+                }, 1000);
+            } else {
+                // Pour les humains, afficher un sélecteur
+                setTimeout(() => {
+                    showUltimateCardDialog(playerIndex);
+                }, 500);
+            }
+            break;
+    }
+    
+    // Afficher la récompense en grand
+    const rewardDiv = document.createElement('div');
+    rewardDiv.style.cssText = `
+        margin-top: 20px;
+        color: #ffd700;
+        font-weight: 800;
+        font-size: 1.2em;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
+        animation: fadeIn 0.8s ease, pulse 1s ease infinite;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 100, 100, 0.2) 100%);
+        border-radius: 15px;
+        border: 2px solid #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    `;
+    rewardDiv.innerHTML = `
+        <div style="font-size: 2.5em; margin-bottom: 10px; animation: bounce 1s ease infinite;">${rewardEmoji}</div>
+        <div style="font-size: 1.1em; line-height: 1.4;">${rewardText}</div>
+    `;
+    messageElement.appendChild(rewardDiv);
+    
+    displayPlayers();
+    
+    // Message au chat
+    addChatMessage(`🎁 ${player.emoji} ${player.prenom} a ouvert son cadeau : ${rewardText}`, 'Système', true, false);
+}
+
+function showUltimateCardDialog(attackerIndex) {
+    const attacker = players[attackerIndex];
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 40px;
+        border-radius: 25px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 0, 110, 0.6);
+        z-index: 4000;
+        text-align: center;
+        border: 4px solid #ff006e;
+        animation: scaleIn 0.3s ease forwards;
+    `;
+    
+    let victimsHTML = '';
+    players.forEach((player, index) => {
+        if (index !== attackerIndex) {
+            victimsHTML += `
+                <button class="victim-btn" data-victim-index="${index}" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    width: 100%;
+                    padding: 20px;
+                    margin: 10px 0;
+                    background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(251, 86, 7, 0.2) 100%);
+                    border: 3px solid #ff006e;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    color: white;
+                    font-size: 1.2em;
+                    font-weight: 700;
+                " onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='#ff4d9e'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#ff006e'">
+                    <span style="font-size: 2em;">${player.emoji}</span>
+                    <div style="text-align: left; flex: 1;">
+                        <div>${player.prenom}</div>
+                        <div style="font-size: 0.9em; color: #ffbe0b;">${player.money}€</div>
+                    </div>
+                </button>
+            `;
+        }
+    });
+    
+    dialog.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">⚡</div>
+        <h2 style="
+            color: #ff006e;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
+            font-weight: 900;
+        ">CARTE ULTIME</h2>
+        <p style="color: #ffd700; font-size: 1.3em; margin-bottom: 30px;">
+            Choisissez un joueur pour lui retirer 50€ !
+        </p>
+        <div style="max-height: 400px; overflow-y: auto;">
+            ${victimsHTML}
+        </div>
+    `;
+    
+    document.body.appendChild(dialog);
+    
+    document.querySelectorAll('.victim-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const victimIndex = parseInt(this.getAttribute('data-victim-index'));
+            const victim = players[victimIndex];
+            
+            victim.money -= 50;
+            displayPlayers();
+            showFloatingMessage(`${victim.emoji} -50€ PAR ${attacker.emoji}`, 'error');
+            addChatMessage(`⚡ ${attacker.emoji} ${attacker.prenom} a utilisé la carte ULTIME sur ${victim.emoji} ${victim.prenom} ! -50€`, 'Système', true, false);
+            
+            dialog.style.transform = 'translate(-50%, -50%) scale(0)';
+            setTimeout(() => dialog.remove(), 300);
+        });
+    });
+}
+
+// Événement "La nuit" - Se déclenche une fois entre 1 et 2 minutes
+function scheduleNightEvent() {
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60s (1min) et 120s (2min)
+    
+    setTimeout(() => {
+        triggerNightEvent();
+        // Ne pas planifier un autre événement (une seule fois dans la partie)
+    }, delay);
+}
+
+function triggerNightEvent() {
+    // Classer les joueurs du plus riche au plus pauvre
+    const sortedPlayers = players.map((player, index) => ({
+        player: player,
+        originalIndex: index,
+        reward: Math.floor(Math.random() * 61) + 40 // Entre 40 et 100
+    })).sort((a, b) => b.player.money - a.player.money);
+    
+    // Créer l'overlay sombre
+    const overlay = document.createElement('div');
+    overlay.className = 'night-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+        z-index: 2998;
+        transition: background 0.8s ease;
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.style.background = 'rgba(0, 0, 20, 0.9)', 50);
+    
+    // Créer des étoiles et particules
+    for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'night-star';
+        const emojis = ['⭐', '✨', '💫', '🌟'];
+        star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        star.style.cssText = `
+            position: fixed;
+            left: ${Math.random() * window.innerWidth}px;
+            top: ${Math.random() * window.innerHeight}px;
+            font-size: ${Math.random() * 2 + 0.5}em;
+            z-index: 2999;
+            animation: starTwinkle ${Math.random() * 2 + 1}s ease-in-out ${Math.random()}s infinite,
+                       starFall ${Math.random() * 3 + 2}s linear ${Math.random() * 2}s infinite;
+            pointer-events: none;
+        `;
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 12000);
+    }
+    
+    // Message "La nuit"
+    const nightMessage = document.createElement('div');
+    nightMessage.className = 'night-dialog';
+    nightMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+        padding: 50px 70px;
+        border-radius: 30px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(100, 100, 255, 0.5);
+        z-index: 3000;
+        text-align: center;
+        border: 4px solid rgba(100, 100, 255, 0.6);
+        transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        max-width: 600px;
+    `;
+    
+    // Créer la liste des joueurs
+    let playersListHTML = '';
+    sortedPlayers.forEach((item, index) => {
+        const medals = ['🥇', '🥈', '🥉'];
+        const rankEmoji = index < 3 ? medals[index] : `${index + 1}.`;
+        const borderColor = index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#9090ff';
+        const glowColor = index === 0 ? 'rgba(255, 215, 0, 0.5)' : index === 1 ? 'rgba(192, 192, 192, 0.5)' : index === 2 ? 'rgba(205, 127, 50, 0.5)' : 'rgba(144, 144, 255, 0.3)';
+        
+        playersListHTML += `
+            <div class="night-player-item" id="night-player-${index}" style="
+                opacity: 0;
+                transform: translateX(-50px) scale(0.9);
+                padding: 18px 28px;
+                margin: 12px 0;
+                background: linear-gradient(135deg, rgba(50, 50, 80, 0.8) 0%, rgba(30, 30, 60, 0.9) 100%);
+                border-radius: 18px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 5px solid ${borderColor};
+                box-shadow: 0 5px 20px ${glowColor}, inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                overflow: hidden;
+            ">
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                    transform: translateX(-100%);
+                    animation: shimmerEffect 2s infinite;
+                "></div>
+                <div style="display: flex; align-items: center; gap: 15px; position: relative; z-index: 1;">
+                    <span style="
+                        font-size: 2em;
+                        font-weight: 900;
+                        color: ${borderColor};
+                        text-shadow: 0 0 10px ${glowColor};
+                        min-width: 40px;
+                        text-align: center;
+                    ">${rankEmoji}</span>
+                    <span style="font-size: 2.2em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${item.player.emoji}</span>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 800; color: #e0e0ff; font-size: 1.2em; text-shadow: 0 0 10px rgba(224, 224, 255, 0.3);">${item.player.prenom}</div>
+                        <div style="font-size: 1em; color: #a0a0d0; font-weight: 600;">💰 ${item.player.money}€</div>
+                    </div>
+                </div>
+                <div class="night-reward" style="
+                    font-size: 2em;
+                    font-weight: 900;
+                    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+                    opacity: 0;
+                    transform: scale(0) rotate(-20deg);
+                    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                    position: relative;
+                    z-index: 1;
+                ">+${item.reward}€</div>
+            </div>
+        `;
+    });
+    
+    nightMessage.innerHTML = `
+        <div class="night-icon" style="font-size: 4.5em; margin-bottom: 15px; animation: bounce 1s ease infinite;">🌙</div>
+        <h2 class="night-title" style="
+            color: #9090ff;
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            text-shadow: 0 0 30px rgba(144, 144, 255, 0.8);
+            font-weight: 900;
+            letter-spacing: 4px;
+        ">LA NUIT</h2>
+        <div class="night-message" style="
+            color: #c0c0ff;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+        ">
+            🏆 Classement et récompenses
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;">
+            ${playersListHTML}
+        </div>
+    `;
+    
+    document.body.appendChild(nightMessage);
+    setTimeout(() => nightMessage.style.transform = 'translate(-50%, -50%) scale(1)', 100);
+    
+    // Animer l'apparition des joueurs et l'attribution des récompenses
+    setTimeout(() => {
+        sortedPlayers.forEach((item, index) => {
+            setTimeout(() => {
+                // Faire apparaître le joueur
+                const playerItem = document.getElementById(`night-player-${index}`);
+                if (playerItem) {
+                    playerItem.style.opacity = '1';
+                    playerItem.style.transform = 'translateX(0) scale(1)';
+                    
+                    // Après 300ms, afficher la récompense
+                    setTimeout(() => {
+                        const rewardEl = playerItem.querySelector('.night-reward');
+                        if (rewardEl) {
+                            rewardEl.style.opacity = '1';
+                            rewardEl.style.transform = 'scale(1.2) rotate(0deg)';
+                            setTimeout(() => {
+                                rewardEl.style.transform = 'scale(1) rotate(0deg)';
+                            }, 200);
+                        }
+                        
+                        // Appliquer la récompense au joueur
+                        item.player.money += item.reward;
+                        displayPlayers();
+                        
+                        // Message flottant
+                        showFloatingMessage(`${item.player.emoji} +${item.reward}€`, 'success');
+                    }, 300);
+                }
+            }, index * 800); // 800ms entre chaque joueur
+        });
+        
+        // Ajouter message au chat après toutes les récompenses
+        const totalDelay = sortedPlayers.length * 800 + 1000;
+        setTimeout(() => {
+            addChatMessage(`🌙 La nuit est tombée ! Tous les joueurs ont reçu leur récompense !`, 'Système', true, false);
+            
+            // Messages des bots
+            setTimeout(() => {
+                const bots = players.filter(p => p.isBot);
+                if (bots.length > 0) {
+                    const randomBot = bots[Math.floor(Math.random() * bots.length)];
+                    const botReward = sortedPlayers.find(item => item.player.prenom === randomBot.prenom);
+                    
+                    let message = '';
+                    if (botReward && botReward.reward >= 80) {
+                        const messages = [
+                            `🤑 Super récompense !`,
+                            `💰 J'ai eu beaucoup d'argent !`,
+                            `🎉 Merci la nuit !`
+                        ];
+                        message = messages[Math.floor(Math.random() * messages.length)];
+                    } else {
+                        const messages = [
+                            `😴 Bonne nuit tout le monde !`,
+                            `🌙 C'était sympa la nuit !`,
+                            `💤 J'ai bien dormi !`
+                        ];
+                        message = messages[Math.floor(Math.random() * messages.length)];
+                    }
+                    
+                    addChatMessage(message, randomBot.prenom, false, true);
+                }
+            }, 500);
+        }, totalDelay);
+        
+        // Fermer le dialogue après tout
+        setTimeout(() => {
+            nightMessage.style.transform = 'translate(-50%, -50%) scale(0)';
+            overlay.style.background = 'rgba(0, 0, 0, 0)';
+            setTimeout(() => {
+                nightMessage.remove();
+                overlay.remove();
+            }, 500);
+        }, totalDelay + 2000);
+    }, 1000);
+}
+
 // Initialisation
 displayPlayers();
 updateCurrentTurn();
 displayTokens();
+
+// Démarrer l'événement selon le choix du joueur
+const eventType = players[0].eventType || 'chicken';
+if (eventType === 'christmas') {
+    scheduleChristmasEvent();
+} else if (eventType === 'night') {
+    scheduleNightEvent();
+} else if (eventType === 'chicken') {
+    scheduleChickenEvent();
+}
 
 // Désactiver le bouton si le premier joueur est un bot
 if (players[currentPlayerIndex].isBot) {

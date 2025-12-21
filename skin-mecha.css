@@ -5,9 +5,50 @@
 
 /* Fond avec effet métallique */
 body.skin-mecha {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
     background-size: 400% 400%;
     animation: mechaBgShift 20s ease infinite;
+    position: relative;
+}
+
+body.skin-mecha::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body.skin-mecha::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 110, 0.15) 0%, transparent 50%);
+    animation: pulseGlow 10s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
 }
 
 @keyframes mechaBgShift {
@@ -17,22 +58,76 @@ body.skin-mecha {
 
 /* Panneau d'information style robotique */
 .skin-mecha .game-info {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
     border: 3px solid #00d9ff;
-    box-shadow: 0 0 30px rgba(0, 217, 255, 0.5), 0 20px 50px rgba(0, 0, 0, 0.8);
-    backdrop-filter: none;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 
+                0 20px 60px rgba(0, 0, 0, 0.9),
+                inset 0 0 30px rgba(0, 217, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
 }
 
 .skin-mecha .game-info::before {
-    background: radial-gradient(circle, rgba(0, 217, 255, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.3) 0%, transparent 70%);
+    animation: hologramPulse 3s ease-in-out infinite;
+}
+
+@keyframes hologramPulse {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
 }
 
 /* Header avec effet néon */
 .skin-mecha .game-header h1 {
     color: #00d9ff;
-    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.5), 0 0 60px rgba(0, 217, 255, 0.3);
-    font-family: 'Impact', sans-serif;
-    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                 0 0 40px rgba(0, 217, 255, 0.8), 
+                 0 0 60px rgba(0, 217, 255, 0.6),
+                 0 0 80px rgba(0, 217, 255, 0.4);
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    letter-spacing: 4px;
+    animation: neonFlicker 5s ease-in-out infinite;
+    position: relative;
+}
+
+.skin-mecha .game-header h1::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    color: #ff006e;
+    text-shadow: 0 0 10px rgba(255, 0, 110, 0.8);
+    opacity: 0;
+    animation: glitchEffect 8s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                     0 0 40px rgba(0, 217, 255, 0.8), 
+                     0 0 60px rgba(0, 217, 255, 0.6),
+                     0 0 80px rgba(0, 217, 255, 0.4);
+    }
+    20%, 24%, 55% {
+        text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+    }
+}
+
+@keyframes glitchEffect {
+    0%, 90%, 100% { opacity: 0; }
+    91%, 94% { opacity: 0.8; transform: translate(-2px, 1px); }
+    92%, 96% { opacity: 0.6; transform: translate(2px, -1px); }
+    93%, 95% { opacity: 0.7; transform: translate(-1px, 2px); }
 }
 
 /* Code de partie style tech */
@@ -68,30 +163,56 @@ body.skin-mecha {
 
 /* Cartes joueurs style mecha */
 .skin-mecha .player-item {
-    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
     border: 2px solid #00d9ff;
-    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4), 
+                inset 0 0 20px rgba(0, 217, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .player-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.skin-mecha .player-item:hover::before {
+    left: 100%;
 }
 
 .skin-mecha .player-item:hover {
     border-color: #0affff;
-    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.7), 
+                inset 0 0 30px rgba(0, 217, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .skin-mecha .player-item.active {
-    background: linear-gradient(135deg, #00d9ff 0%, #005f73 100%);
-    border: 2px solid #0affff;
-    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8), 0 0 50px rgba(0, 217, 255, 0.4);
+    background: linear-gradient(135deg, #00d9ff 0%, #0080a0 100%);
+    border: 3px solid #0affff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 1), 
+                0 0 60px rgba(0, 217, 255, 0.6),
+                inset 0 0 30px rgba(255, 255, 255, 0.2);
     animation: mechaActivePulse 2s infinite;
 }
 
 @keyframes mechaActivePulse {
     0%, 100% {
-        box-shadow: 0 0 30px rgba(0, 217, 255, 0.8), 0 0 50px rgba(0, 217, 255, 0.4);
+        box-shadow: 0 0 40px rgba(0, 217, 255, 1), 
+                    0 0 60px rgba(0, 217, 255, 0.6),
+                    inset 0 0 30px rgba(255, 255, 255, 0.2);
         transform: scale(1.05);
     }
     50% {
-        box-shadow: 0 0 40px rgba(0, 217, 255, 1), 0 0 70px rgba(0, 217, 255, 0.6);
+        box-shadow: 0 0 50px rgba(0, 217, 255, 1), 
+                    0 0 80px rgba(0, 217, 255, 0.8),
+                    inset 0 0 40px rgba(255, 255, 255, 0.3);
         transform: scale(1.08);
     }
 }
@@ -108,14 +229,46 @@ body.skin-mecha {
 /* Bouton lancer les dés style mecha */
 .skin-mecha .btn-action {
     background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);
-    border: 2px solid #ff006e;
-    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5), 0 5px 15px rgba(251, 86, 7, 0.3);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    border: 3px solid #ff006e;
+    box-shadow: 0 0 30px rgba(255, 0, 110, 0.6), 
+                0 5px 20px rgba(251, 86, 7, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+                 0 2px 5px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .btn-action::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.skin-mecha .btn-action:hover::before {
+    width: 300%;
+    height: 300%;
 }
 
 .skin-mecha .btn-action:hover {
-    box-shadow: 0 0 30px rgba(255, 0, 110, 0.8), 0 8px 25px rgba(251, 86, 7, 0.5);
+    box-shadow: 0 0 50px rgba(255, 0, 110, 1), 
+                0 8px 30px rgba(251, 86, 7, 0.6),
+                inset 0 0 30px rgba(255, 255, 255, 0.2);
     border-color: #ff4d9e;
+    transform: scale(1.05);
+    animation: buttonPulse 0.5s ease-in-out;
+}
+
+@keyframes buttonPulse {
+    0%, 100% { transform: scale(1.05); }
+    50% { transform: scale(1.08); }
 }
 
 /* Bouton quitter style mecha */
@@ -131,10 +284,26 @@ body.skin-mecha {
 
 /* Plateau style mecha */
 .skin-mecha .board {
-    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    background: linear-gradient(135deg, #0a0e27 0%, #0f3460 100%);
     border: 8px solid #00d9ff;
-    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 0 25px 70px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 60px rgba(0, 217, 255, 0.8), 
+                0 25px 80px rgba(0, 0, 0, 0.9),
+                inset 0 0 40px rgba(0, 217, 255, 0.1);
     position: relative;
+    animation: boardGlow 4s ease-in-out infinite;
+}
+
+@keyframes boardGlow {
+    0%, 100% {
+        box-shadow: 0 0 60px rgba(0, 217, 255, 0.8), 
+                    0 25px 80px rgba(0, 0, 0, 0.9),
+                    inset 0 0 40px rgba(0, 217, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 80px rgba(0, 217, 255, 1), 
+                    0 25px 80px rgba(0, 0, 0, 0.9),
+                    inset 0 0 60px rgba(0, 217, 255, 0.2);
+    }
 }
 
 .skin-mecha .board::before {
@@ -148,8 +317,15 @@ body.skin-mecha {
         0deg,
         transparent,
         transparent 50px,
-        rgba(0, 217, 255, 0.03) 50px,
-        rgba(0, 217, 255, 0.03) 51px
+        rgba(0, 217, 255, 0.05) 50px,
+        rgba(0, 217, 255, 0.05) 51px
+    ),
+    repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 50px,
+        rgba(0, 217, 255, 0.05) 50px,
+        rgba(0, 217, 255, 0.05) 51px
     );
     pointer-events: none;
     z-index: 1;
@@ -157,30 +333,103 @@ body.skin-mecha {
 
 /* Centre du plateau style mecha */
 .skin-mecha .board-center {
-    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
-    border: 3px solid #00d9ff;
-    box-shadow: inset 0 0 30px rgba(0, 217, 255, 0.2);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
+    border: 4px solid #00d9ff;
+    box-shadow: inset 0 0 40px rgba(0, 217, 255, 0.3),
+                0 0 40px rgba(0, 217, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .board-center::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(0, 217, 255, 0.1) 90deg,
+        transparent 180deg,
+        rgba(255, 0, 110, 0.1) 270deg,
+        transparent 360deg
+    );
+    animation: rotateConic 10s linear infinite;
+}
+
+@keyframes rotateConic {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .skin-mecha .board-center h2 {
     color: #00d9ff;
-    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 0 0 40px rgba(0, 217, 255, 0.8);
-    font-family: 'Impact', sans-serif;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                 0 0 40px rgba(0, 217, 255, 0.8),
+                 0 0 60px rgba(0, 217, 255, 0.5);
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    position: relative;
+    z-index: 1;
+    animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+    0%, 100% {
+        text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                     0 0 40px rgba(0, 217, 255, 0.8),
+                     0 0 60px rgba(0, 217, 255, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 30px rgba(0, 217, 255, 1), 
+                     0 0 60px rgba(0, 217, 255, 1),
+                     0 0 90px rgba(0, 217, 255, 0.7);
+    }
 }
 
 /* Cellules style mecha */
 .skin-mecha .cell {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%);
     border: 2px solid #00d9ff;
     color: #00d9ff;
     position: relative;
     z-index: 2;
+    overflow: hidden;
+}
+
+.skin-mecha .cell::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(0, 217, 255, 0.2) 50%,
+        transparent 60%
+    );
+    animation: cellScan 3s linear infinite;
+    opacity: 0;
+}
+
+.skin-mecha .cell:hover::after {
+    opacity: 1;
+}
+
+@keyframes cellScan {
+    0% { transform: translate(-100%, -100%); }
+    100% { transform: translate(100%, 100%); }
 }
 
 .skin-mecha .cell:hover {
-    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 1) 0%, rgba(15, 52, 96, 1) 100%);
     border-color: #0affff;
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6),
+                inset 0 0 20px rgba(0, 217, 255, 0.2);
+    transform: translateY(-3px);
 }
 
 .skin-mecha .cell-name {
@@ -195,14 +444,46 @@ body.skin-mecha {
 
 /* Coins style mecha */
 .skin-mecha .corner {
-    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
     border: 3px solid #00d9ff;
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4),
+                inset 0 0 20px rgba(0, 217, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .corner::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.3) 0%, transparent 70%);
+    animation: cornerPulse 3s ease-out infinite;
+}
+
+@keyframes cornerPulse {
+    0% {
+        width: 0;
+        height: 0;
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+    100% {
+        width: 200%;
+        height: 200%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+    }
 }
 
 .skin-mecha .corner:hover {
-    box-shadow: 0 0 30px rgba(0, 217, 255, 0.7);
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.7),
+                inset 0 0 30px rgba(0, 217, 255, 0.25);
     transform: scale(1.08);
+    border-color: #0affff;
 }
 
 .skin-mecha .corner-name {
@@ -216,18 +497,47 @@ body.skin-mecha {
 
 /* Pions des joueurs style mecha */
 .skin-mecha .player-token {
-    filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
+    filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) 
+            drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
     animation: mechaTokenFloat 2s ease-in-out infinite;
+    position: relative;
+}
+
+.skin-mecha .player-token::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: radial-gradient(ellipse at center, rgba(0, 217, 255, 0.8) 0%, transparent 70%);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+    border-radius: 50%;
+    animation: shadowPulse 2s ease-in-out infinite;
 }
 
 @keyframes mechaTokenFloat {
     0%, 100% {
-        transform: translateY(0);
-        filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
+        transform: translateY(0) rotateY(0deg);
+        filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.8)) 
+                drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
     }
     50% {
-        transform: translateY(-5px);
-        filter: drop-shadow(0 0 15px rgba(0, 217, 255, 1)) drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+        transform: translateY(-5px) rotateY(180deg);
+        filter: drop-shadow(0 0 15px rgba(0, 217, 255, 1)) 
+                drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+    }
+}
+
+@keyframes shadowPulse {
+    0%, 100% {
+        opacity: 0.6;
+        width: 60%;
+    }
+    50% {
+        opacity: 1;
+        width: 80%;
     }
 }
 
@@ -334,6 +644,147 @@ body.skin-mecha {
 @keyframes mechaScan {
     0% { transform: translateY(0); }
     100% { transform: translateY(800px); }
+}
+
+/* ============================================
+   ÉVÉNEMENT "LA NUIT" MODE MECHA
+   ============================================ */
+
+/* Overlay de la nuit en mode mecha */
+body.skin-mecha .night-overlay {
+    background: linear-gradient(135deg, rgba(0, 10, 30, 0.95) 0%, rgba(10, 14, 39, 0.95) 100%) !important;
+}
+
+/* Dialogue de la nuit en mode mecha */
+body.skin-mecha .night-dialog {
+    background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%) !important;
+    border: 4px solid #00d9ff !important;
+    box-shadow: 0 0 60px rgba(0, 217, 255, 0.8), 
+                0 30px 80px rgba(0, 0, 0, 0.9),
+                inset 0 0 40px rgba(0, 217, 255, 0.15) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+body.skin-mecha .night-dialog::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 20px,
+        rgba(0, 217, 255, 0.05) 20px,
+        rgba(0, 217, 255, 0.05) 40px
+    );
+    animation: mechaNightPattern 3s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes mechaNightPattern {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+}
+
+body.skin-mecha .night-dialog::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(0, 217, 255, 0.1) 90deg,
+        transparent 180deg,
+        rgba(255, 0, 110, 0.1) 270deg,
+        transparent 360deg
+    );
+    animation: rotateConic 10s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Icône lune en mode mecha */
+body.skin-mecha .night-icon {
+    filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.8)) 
+            drop-shadow(0 0 50px rgba(0, 217, 255, 0.5)) !important;
+    animation: mechaMoonFloat 2s ease-in-out infinite !important;
+}
+
+@keyframes mechaMoonFloat {
+    0%, 100% { 
+        transform: translateY(0) rotateZ(0deg);
+        filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.8)) 
+                drop-shadow(0 0 50px rgba(0, 217, 255, 0.5));
+    }
+    50% { 
+        transform: translateY(-10px) rotateZ(10deg);
+        filter: drop-shadow(0 0 40px rgba(0, 217, 255, 1)) 
+                drop-shadow(0 0 70px rgba(0, 217, 255, 0.7));
+    }
+}
+
+/* Titre "LA NUIT" en mode mecha */
+body.skin-mecha .night-title {
+    color: #00d9ff !important;
+    text-shadow: 0 0 30px rgba(0, 217, 255, 1), 
+                 0 0 50px rgba(0, 217, 255, 0.8),
+                 0 0 70px rgba(0, 217, 255, 0.6) !important;
+    font-family: 'Impact', 'Arial Black', sans-serif !important;
+    position: relative;
+    z-index: 1;
+    animation: mechaNightTitleGlow 2s ease-in-out infinite !important;
+}
+
+@keyframes mechaNightTitleGlow {
+    0%, 100% {
+        text-shadow: 0 0 30px rgba(0, 217, 255, 1), 
+                     0 0 50px rgba(0, 217, 255, 0.8),
+                     0 0 70px rgba(0, 217, 255, 0.6);
+    }
+    50% {
+        text-shadow: 0 0 40px rgba(0, 217, 255, 1), 
+                     0 0 70px rgba(0, 217, 255, 1),
+                     0 0 100px rgba(0, 217, 255, 0.8);
+    }
+}
+
+/* Texte du message en mode mecha */
+body.skin-mecha .night-message {
+    color: #00d9ff !important;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.6) !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Étoiles en mode mecha (deviennent des particules cyber) */
+body.skin-mecha .night-star {
+    color: #00d9ff !important;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.8),
+                 0 0 20px rgba(0, 217, 255, 0.5) !important;
+    animation: mechaStarPulse 1.5s ease-in-out infinite !important;
+}
+
+@keyframes mechaStarPulse {
+    0%, 100% { 
+        opacity: 0.6;
+        transform: scale(1);
+        text-shadow: 0 0 10px rgba(0, 217, 255, 0.8),
+                     0 0 20px rgba(0, 217, 255, 0.5);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.3);
+        text-shadow: 0 0 20px rgba(0, 217, 255, 1),
+                     0 0 40px rgba(0, 217, 255, 0.8),
+                     0 0 60px rgba(0, 217, 255, 0.5);
+    }
 }
 
 /* ============================================
@@ -534,10 +985,45 @@ body.skin-mecha {
 
 /* Message utilisateur style mecha */
 .skin-mecha .chat-message.user {
-    background: #667eea;
-    border: 2px solid #764ba2;
-    box-shadow: 0 0 15px rgba(102, 126, 234, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
-    color: white;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(22, 33, 62, 0.8) 100%);
+    border: 2px solid #00d9ff;
+    border-left: 4px solid #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.4), 
+                0 4px 10px rgba(0, 0, 0, 0.3),
+                inset 0 0 15px rgba(0, 217, 255, 0.1);
+    color: #00d9ff;
+    text-shadow: 0 0 5px rgba(0, 217, 255, 0.3);
+    animation: messageAppear 0.4s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .chat-message.user::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.3), transparent);
+    animation: messageSlide 0.6s ease-out;
+}
+
+@keyframes messageAppear {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes messageSlide {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
     font-weight: 600;
 }
@@ -703,6 +1189,125 @@ body.skin-mecha {
     color: #00d9ff;
 }
 
+/* ============================================
+   DÉS STYLE MECHA - Effet Holographique
+   ============================================ */
+
+.skin-mecha .dice {
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.6),
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 217, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .dice::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(0, 217, 255, 0.2) 45deg,
+        transparent 90deg,
+        rgba(255, 0, 110, 0.2) 135deg,
+        transparent 180deg,
+        rgba(0, 217, 255, 0.2) 225deg,
+        transparent 270deg,
+        rgba(255, 0, 110, 0.2) 315deg,
+        transparent 360deg
+    );
+    animation: diceRotate 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes diceRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.skin-mecha .dice-face {
+    color: #00d9ff;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 1),
+                 0 0 30px rgba(0, 217, 255, 0.8);
+    font-weight: 900;
+    position: relative;
+    z-index: 1;
+}
+
+.skin-mecha .dice:hover {
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.9),
+                0 15px 50px rgba(0, 0, 0, 0.6),
+                inset 0 0 30px rgba(0, 217, 255, 0.3);
+    transform: scale(1.1) rotateY(20deg);
+    border-color: #0affff;
+}
+
+/* Points sur les dés */
+.skin-mecha .dice-dot {
+    background: radial-gradient(circle, #00d9ff 0%, #0affff 50%, rgba(0, 217, 255, 0.5) 100%);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 1),
+                0 0 25px rgba(0, 217, 255, 0.8);
+    animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(0, 217, 255, 1),
+                    0 0 25px rgba(0, 217, 255, 0.8);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(0, 217, 255, 1),
+                    0 0 40px rgba(0, 217, 255, 1);
+    }
+}
+
+/* ============================================
+   NOTIFICATIONS ET MODALES MECHA
+   ============================================ */
+
+.skin-mecha .notification {
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.98) 0%, rgba(26, 26, 46, 0.98) 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.7),
+                0 15px 50px rgba(0, 0, 0, 0.8);
+    color: #00d9ff;
+    position: relative;
+    overflow: hidden;
+}
+
+.skin-mecha .notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.3), transparent);
+    animation: notificationSlide 2s ease-in-out infinite;
+}
+
+@keyframes notificationSlide {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.skin-mecha .notification-title {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1),
+                 0 0 40px rgba(0, 217, 255, 0.6);
+}
+
+.skin-mecha .notification-message {
+    color: #0affff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
 /* Cellules du plateau style mecha */
 .skin-mecha .cell {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -744,3 +1349,66 @@ body.skin-mecha {
     text-shadow: 0 0 5px rgba(255, 190, 11, 0.5);
 }
 
+
+
+/* Animation de chute de neige */
+@keyframes snowFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.8;
+    }
+}
+
+/* Animations de Noël */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes scaleIn {
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Styling pour l'événement de Noël */
+.skin-mecha .christmas-overlay {
+    backdrop-filter: blur(8px);
+}
+
+.skin-mecha .christmas-dialog {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #0a3a0a 0%, #052105 100%) !important;
+    border-color: #00d9ff !important;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha .christmas-player-gift {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(255, 0, 110, 0.1) 100%) !important;
+    border-color: #00d9ff !important;
+}
+
+.skin-mecha .christmas-player-gift:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4);
+}

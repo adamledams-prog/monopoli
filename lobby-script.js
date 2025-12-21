@@ -170,6 +170,7 @@ if (currentPlayer.isHost) {
     document.getElementById('btn-start').style.display = 'block';
     document.getElementById('btn-add-bot').style.display = 'block';
     document.querySelector('.money-selector-section').style.display = 'block';
+    document.querySelector('.event-selector-section').style.display = 'block';
 }
 
 // Gestion de la sélection d'argent
@@ -188,6 +189,26 @@ document.querySelectorAll('.money-btn').forEach(btn => {
 
         // Mettre à jour dans localStorage
         currentPlayer.startingMoney = selectedMoney;
+        localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
+    });
+});
+
+// Gestion de la sélection d'événement
+let selectedEvent = currentPlayer.eventType || 'christmas';
+
+document.querySelectorAll('.event-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Retirer la sélection précédente
+        document.querySelectorAll('.event-btn').forEach(b => b.classList.remove('active'));
+        
+        // Ajouter la sélection au bouton cliqué
+        this.classList.add('active');
+        
+        // Mettre à jour l'événement sélectionné
+        selectedEvent = this.getAttribute('data-event');
+        
+        // Mettre à jour dans localStorage
+        currentPlayer.eventType = selectedEvent;
         localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
     });
 });
