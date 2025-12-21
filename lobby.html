@@ -11,7 +11,7 @@
     <div class="container">
         <div class="lobby-box">
             <h1>🎲 Salle d'attente</h1>
-            
+
             <div class="game-code-section">
                 <div class="code-label">Code de la partie</div>
                 <div class="game-code" id="game-code">000</div>
@@ -29,7 +29,7 @@
                 <button id="btn-add-bot" class="btn btn-bots" style="display: none;">
                     ➕ Ajouter un bot
                 </button>
-                
+
                 <div class="money-selector-section" style="display: none;">
                     <label class="money-label">💰 Argent de départ</label>
                     <div class="money-selector">
@@ -38,7 +38,7 @@
                         <button class="money-btn" data-money="2000">2000€</button>
                     </div>
                 </div>
-                
+
                 <button id="btn-start" class="btn btn-start" style="display: none;">
                     🚀 Lancer la partie
                 </button>
@@ -51,6 +51,15 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- Firebase Configuration & Manager -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-manager.js"></script>
+
+    <!-- Application Script -->
     <script src="lobby-script.js"></script>
 </body>
 </html>

@@ -1,3 +1,20 @@
+// Initialiser Firebase au chargement de la page
+(async function initFirebase() {
+    try {
+        if (window.firebaseManager) {
+            await window.firebaseManager.init();
+            console.log('✅ Firebase prêt pour le lobby');
+
+            // Démarrer l'écoute des joueurs en temps réel
+            if (window.firebaseManager.isAvailable() && gameCode) {
+                startRealtimeSync();
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Firebase non disponible, mode local activé:', error.message);
+    }
+})();
+
 // Récupérer les informations du joueur
 let currentPlayer = JSON.parse(localStorage.getItem('currentPlayer'));
 
@@ -36,8 +53,11 @@ if (currentPlayer.isHost && gameCode.length !== 3) {
 // Afficher le code de partie
 document.getElementById('game-code').textContent = gameCode;
 
-// Liste des joueurs (simulée pour l'instant)
-let players = [currentPlayer];
+// Liste des joueurs (sera synchronisée avec Firebase)
+let players = [];
+
+// Variable pour savoir si on utilise Firebase
+let isUsingFirebase = false;
 
 // Noms aléatoires pour les bots
 const botNames = ['RoboMax', 'CyberBot', 'MegaTron', 'NanoBot', 'TechBot', 'PixelBot', 'ByteBot'];
@@ -45,31 +65,60 @@ const botEmojis = ['🤖', '👾', '💀', '👻', '👽', '🤡', '🤓', '🤠
 let usedBotNames = [];
 let usedBotEmojis = [];
 
-// Charger les bots depuis le localStorage
-let savedBots = JSON.parse(localStorage.getItem('gameBots')) || [];
+// Fonction pour démarrer la synchronisation temps réel avec Firebase
+function startRealtimeSync() {
+    isUsingFirebase = true;
 
-// Ajouter les bots à la liste des joueurs
-savedBots.forEach(bot => {
-    players.push({
-        prenom: bot.name,
-        emoji: bot.emoji || '🤖',
-        gameCode: gameCode,
-        isHost: false,
-        isBot: true
+    // Écouter les changements de joueurs en temps réel
+    window.firebaseManager.listenToPlayers(gameCode, (firebasePlayers) => {
+        players = firebasePlayers;
+        displayPlayers();
+
+        // Afficher le bouton de démarrage seulement pour l'hôte
+        const currentPlayerId = localStorage.getItem('currentPlayerId');
+        const isHost = firebasePlayers.some(p => p.id === currentPlayerId && p.isHost);
+
+        if (isHost) {
+            document.getElementById('btn-add-bot').style.display = 'block';
+            document.querySelector('.money-selector-section').style.display = 'block';
+            document.getElementById('btn-start').style.display = 'block';
+        }
     });
-    usedBotNames.push(bot.name);
-    usedBotEmojis.push(bot.emoji || '🤖');
-});
+
+    console.log('🔄 Synchronisation temps réel activée');
+}
+
+// Mode local: charger depuis localStorage si Firebase n'est pas disponible
+if (!window.firebaseManager || !window.firebaseManager.isAvailable()) {
+    // Mode local
+    players = [currentPlayer];
+
+    // Charger les bots depuis le localStorage
+    let savedBots = JSON.parse(localStorage.getItem('gameBots')) || [];
+
+    // Ajouter les bots à la liste des joueurs
+    savedBots.forEach(bot => {
+        players.push({
+            prenom: bot.name,
+            emoji: bot.emoji || '🤖',
+            gameCode: gameCode,
+            isHost: false,
+            isBot: true
+        });
+        usedBotNames.push(bot.name);
+        usedBotEmojis.push(bot.emoji || '🤖');
+    });
+}
 
 // Fonction pour afficher les joueurs
 function displayPlayers() {
     const playersList = document.getElementById('players-list');
     playersList.innerHTML = '';
-    
+
     players.forEach((player, index) => {
         const playerCard = document.createElement('div');
         playerCard.className = 'player-card' + (player.isHost ? ' host' : '');
-        
+
         playerCard.innerHTML = `
             <div class="player-emoji">${player.emoji}</div>
             <div class="player-info">
@@ -79,32 +128,32 @@ function displayPlayers() {
             </div>
             ${player.isBot && currentPlayer.isHost ? '<button class="delete-bot-btn" data-index="' + index + '">🗑️</button>' : ''}
         `;
-        
+
         playersList.appendChild(playerCard);
     });
-    
+
     // Ajouter les gestionnaires d'événements pour les boutons de suppression
     if (currentPlayer.isHost) {
         document.querySelectorAll('.delete-bot-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const botIndex = parseInt(this.getAttribute('data-index'));
                 const bot = players[botIndex];
-                
+
                 if (confirm(`Voulez-vous vraiment supprimer ${bot.emoji} ${bot.prenom} ?`)) {
                     // Retirer le bot de la liste
                     players.splice(botIndex, 1);
-                    
+
                     // Retirer des listes d'utilisation
                     usedBotNames = usedBotNames.filter(name => name !== bot.prenom);
                     usedBotEmojis = usedBotEmojis.filter(emoji => emoji !== bot.emoji);
-                    
+
                     // Mettre à jour localStorage
                     const botsToSave = players.filter(p => p.isBot).map(p => ({
                         name: p.prenom,
                         emoji: p.emoji
                     }));
                     localStorage.setItem('gameBots', JSON.stringify(botsToSave));
-                    
+
                     displayPlayers();
                     showMessage(`✅ ${bot.emoji} ${bot.prenom} supprimé !`, 'success');
                 }
@@ -130,13 +179,13 @@ document.querySelectorAll('.money-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         // Retirer la sélection précédente
         document.querySelectorAll('.money-btn').forEach(b => b.classList.remove('active'));
-        
+
         // Ajouter la sélection au bouton cliqué
         this.classList.add('active');
-        
+
         // Mettre à jour l'argent sélectionné
         selectedMoney = parseInt(this.getAttribute('data-money'));
-        
+
         // Mettre à jour dans localStorage
         currentPlayer.startingMoney = selectedMoney;
         localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
@@ -164,36 +213,52 @@ function getRandomBotEmoji() {
 }
 
 // Bouton Ajouter un bot
-document.getElementById('btn-add-bot').addEventListener('click', function() {
+document.getElementById('btn-add-bot').addEventListener('click', async function() {
     if (players.length >= 10) {
         showMessage('⚠️ Maximum 10 joueurs (joueurs + bots)', 'error');
         return;
     }
-    
+
     const botName = getRandomBotName();
     const botEmoji = getRandomBotEmoji();
     usedBotNames.push(botName);
     usedBotEmojis.push(botEmoji);
-    
+
     const newBot = {
-        prenom: botName,
+        name: botName,
         emoji: botEmoji,
-        gameCode: gameCode,
-        isHost: false,
-        isBot: true
+        difficulty: 'normal'
     };
-    
-    players.push(newBot);
-    
-    // Sauvegarder dans localStorage
-    const botsToSave = players.filter(p => p.isBot).map(p => ({
-        name: p.prenom,
-        emoji: p.emoji
-    }));
-    localStorage.setItem('gameBots', JSON.stringify(botsToSave));
-    
-    displayPlayers();
-    showMessage(`✅ ${newBot.emoji} ${newBot.prenom} ajouté !`, 'success');
+
+    try {
+        // Utiliser Firebase si disponible
+        if (isUsingFirebase && window.firebaseManager) {
+            await window.firebaseManager.addBot(gameCode, newBot);
+            showMessage(`✅ ${newBot.emoji} ${newBot.name} ajouté !`, 'success');
+        } else {
+            // Mode local
+            players.push({
+                prenom: newBot.name,
+                emoji: newBot.emoji,
+                gameCode: gameCode,
+                isHost: false,
+                isBot: true
+            });
+
+            // Sauvegarder dans localStorage
+            const botsToSave = players.filter(p => p.isBot).map(p => ({
+                name: p.prenom,
+                emoji: p.emoji
+            }));
+            localStorage.setItem('gameBots', JSON.stringify(botsToSave));
+
+            displayPlayers();
+            showMessage(`✅ ${newBot.emoji} ${newBot.name} ajouté !`, 'success');
+        }
+    } catch (error) {
+        console.error('Erreur ajout bot:', error);
+        showMessage(`❌ Erreur: ${error.message}`, 'error');
+    }
 });
 
 
@@ -204,39 +269,66 @@ function showMessage(text, type) {
     messageDiv.textContent = text;
     messageDiv.className = 'message ' + type;
     messageDiv.style.display = 'block';
-    
+
     setTimeout(() => {
         messageDiv.style.display = 'none';
     }, 5000);
 }
 
 // Bouton Lancer la partie
-document.getElementById('btn-start').addEventListener('click', function() {
+document.getElementById('btn-start').addEventListener('click', async function() {
     if (!currentPlayer.isHost) {
         showMessage('⚠️ Seul l\'hôte peut lancer la partie', 'error');
         return;
     }
-    
+
     if (players.length < 1) {
         showMessage('⚠️ Il faut au moins 1 joueur pour commencer', 'error');
         return;
     }
-    
-    showMessage('🚀 Lancement de la partie...', 'success');
-    
-    // Sauvegarder les joueurs (y compris les bots) dans le localStorage
-    localStorage.setItem('gamePlayers', JSON.stringify(players));
-    
-    // Rediriger vers le jeu
-    setTimeout(() => {
-        window.location.href = 'map.html';
-    }, 2000);
+
+    // Désactiver le bouton pendant le traitement
+    this.disabled = true;
+    this.textContent = '⏳ Démarrage...';
+
+    try {
+        showMessage('🚀 Lancement de la partie...', 'success');
+
+        // Utiliser Firebase si disponible
+        if (isUsingFirebase && window.firebaseManager) {
+            await window.firebaseManager.startGame(gameCode);
+        } else {
+            // Mode local: sauvegarder dans localStorage
+            localStorage.setItem('gamePlayers', JSON.stringify(players));
+        }
+
+        // Rediriger vers le jeu
+        setTimeout(() => {
+            window.location.href = 'map.html';
+        }, 1500);
+    } catch (error) {
+        console.error('Erreur démarrage partie:', error);
+        showMessage(`❌ Erreur: ${error.message}`, 'error');
+        this.disabled = false;
+        this.textContent = '🚀 Lancer la partie';
+    }
 });
 
 // Bouton Quitter
-document.getElementById('btn-leave').addEventListener('click', function() {
+document.getElementById('btn-leave').addEventListener('click', async function() {
     if (confirm('Êtes-vous sûr de vouloir quitter la partie ?')) {
+        // Si Firebase est utilisé, signaler la déconnexion
+        if (isUsingFirebase && window.firebaseManager) {
+            const playerId = localStorage.getItem('currentPlayerId');
+            if (playerId) {
+                await window.firebaseManager.leaveGame(gameCode, playerId);
+            }
+            window.firebaseManager.cleanup();
+        }
+
         localStorage.removeItem('currentPlayer');
+        localStorage.removeItem('currentPlayerId');
+        localStorage.removeItem('currentGameCode');
         window.location.href = 'index.html';
     }
 });
@@ -246,7 +338,7 @@ document.getElementById('btn-leave').addEventListener('click', function() {
 setTimeout(() => {
     const randomEmojis = ['😎', '🤩', '🥳', '🤖'];
     const randomNames = ['Alice', 'Bob', 'Charlie', 'Diana'];
-    
+
     // Décommenter pour tester avec des joueurs simulés
     // const randomPlayer = {
     //     prenom: randomNames[Math.floor(Math.random() * randomNames.length)],

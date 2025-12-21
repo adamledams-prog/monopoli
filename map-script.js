@@ -1,3 +1,27 @@
+// Initialiser Firebase et la synchronisation du jeu
+(async function initGameSync() {
+    try {
+        if (window.firebaseManager) {
+            await window.firebaseManager.init();
+
+            // Initialiser la synchronisation du jeu
+            const gameCode = currentPlayer.gameCode;
+            const isHost = currentPlayer.isHost;
+
+            if (window.gameSyncHelper) {
+                await window.gameSyncHelper.init(gameCode, isHost);
+
+                // Si on est l'hôte, démarrer la synchronisation automatique
+                if (isHost) {
+                    window.gameSyncHelper.startAutoSync();
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Firebase non disponible pour le jeu:', error.message);
+    }
+})();
+
 // Récupérer les informations du joueur
 let currentPlayer = JSON.parse(localStorage.getItem('currentPlayer'));
 
@@ -83,12 +107,12 @@ function checkMoneyAlert(player) {
     for (let threshold of moneyAlertThresholds) {
         if (player.money <= threshold && (player.lastMoneyAlert === null || player.lastMoneyAlert > threshold)) {
             player.lastMoneyAlert = threshold;
-            
+
             // Si c'est un bot qui a moins de 1000€, il se plaint
             if (player.isBot && player.money < 1000) {
                 addChatMessage('😰 Je suis dans la mouise !', player.prenom, false, true);
             }
-            
+
             // Choisir un bot aléatoire pour envoyer le message (mais pas le joueur lui-même s'il est un bot)
             const bots = players.filter(p => p.isBot && p.prenom !== player.prenom);
             if (bots.length > 0) {
@@ -105,11 +129,11 @@ function checkMoneyAlert(player) {
 function displayPlayers() {
     const playersInfo = document.getElementById('players-info');
     playersInfo.innerHTML = '';
-    
+
     players.forEach((player, index) => {
         const playerItem = document.createElement('div');
         playerItem.className = 'player-item' + (index === currentPlayerIndex ? ' active' : '');
-        
+
         playerItem.innerHTML = `
             <div class="player-item-emoji">${player.emoji}</div>
             <div class="player-item-info">
@@ -117,10 +141,10 @@ function displayPlayers() {
                 <div class="player-item-money">${player.money}€</div>
             </div>
         `;
-        
+
         playersInfo.appendChild(playerItem);
     });
-    
+
     // Vérifier les alertes d'argent pour chaque joueur
     players.forEach(player => {
         checkMoneyAlert(player);
@@ -138,7 +162,7 @@ function updateCurrentTurn() {
 function displayTokens() {
     // Retirer tous les pions existants
     document.querySelectorAll('.player-token').forEach(token => token.remove());
-    
+
     // Grouper les joueurs par position
     const playersByPosition = {};
     players.forEach((player, index) => {
@@ -147,7 +171,7 @@ function displayTokens() {
         }
         playersByPosition[player.position].push({ player, originalIndex: index });
     });
-    
+
     // Afficher les pions groupés par position
     Object.keys(playersByPosition).forEach(position => {
         const cell = document.querySelector(`[data-position="${position}"]`);
@@ -157,11 +181,11 @@ function displayTokens() {
                 const token = document.createElement('div');
                 token.className = 'player-token';
                 token.textContent = playerData.player.emoji;
-                
+
                 // Disposer les pions en grille 2x2
                 token.style.left = `${(indexOnCell % 2) * 30}px`;
                 token.style.top = `${Math.floor(indexOnCell / 2) * 30}px`;
-                
+
                 cell.appendChild(token);
             });
         }
@@ -171,39 +195,39 @@ function displayTokens() {
 // Lancer les dés
 function rollDice() {
     if (diceRolling) return;
-    
+
     const currentPlayer = players[currentPlayerIndex];
-    
+
     // Vérifier si le joueur est en prison
     if (currentPlayer.inJail && currentPlayer.jailTurns > 0) {
         showJailDialog(currentPlayerIndex);
         return;
     }
-    
+
     diceRolling = true;
     const btn = document.getElementById('btn-roll-dice');
     btn.disabled = true;
-    
+
     const diceResult = document.getElementById('dice-result');
     let rolls = 0;
     const maxRolls = 10;
-    
+
     // Vérifier si c'est un bot qui joue
     const isBot = currentPlayer.isBot;
-    
+
     // Animation du lancer de dés
     const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
     const interval = setInterval(() => {
         const dice1 = Math.floor(Math.random() * 6) + 1;
         const dice2 = Math.floor(Math.random() * 6) + 1;
         diceResult.innerHTML = `<span style="display: inline-block; animation: spin 0.1s linear;">${diceEmojis[dice1-1]}</span> + <span style="display: inline-block; animation: spin 0.1s linear;">${diceEmojis[dice2-1]}</span>`;
-        
+
         rolls++;
-        
+
         if (rolls >= maxRolls) {
             clearInterval(interval);
             let finalDice1, finalDice2, total;
-            
+
             if (isBot) {
                 // Pour les bots: générer un nombre entre 2 et 12
                 total = Math.floor(Math.random() * 11) + 2;
@@ -220,12 +244,12 @@ function rollDice() {
                 finalDice2 = Math.floor(Math.random() * 6) + 1;
                 total = finalDice1 + finalDice2;
             }
-            
+
             diceResult.innerHTML = `<div style="font-size: 1.5em; margin-bottom: 10px;">${diceEmojis[finalDice1-1]} + ${diceEmojis[finalDice2-1]}</div><div style="font-size: 1.2em; color: #667eea; font-weight: bold;">= ${total}</div>`;
-            
+
             // Déplacer le joueur
             movePlayer(currentPlayerIndex, total);
-            
+
             // Réinitialiser le diceRolling après un court délai
             setTimeout(() => {
                 diceRolling = false;
@@ -242,12 +266,12 @@ function movePlayer(playerIndex, steps) {
     const startPosition = player.position;
     let newPosition = player.position + steps;
     let passedStart = false;
-    
+
     // Si on passe par la case départ (sans s'arrêter dessus)
     if (newPosition >= 40) {
         newPosition = newPosition % 40;
         passedStart = true;
-        
+
         // Afficher le dialog animé pour le passage par la case départ (+200€)
         setTimeout(() => {
             showPassStartDialog(playerIndex, () => {
@@ -255,14 +279,14 @@ function movePlayer(playerIndex, steps) {
                 checkLanding(playerIndex);
             });
         }, 1000);
-        
+
         // Messages des bots pour le passage à la case départ
         setTimeout(() => {
             const bots = players.filter(p => p.isBot && p.prenom !== player.prenom);
             if (bots.length > 0) {
                 const randomBot = bots[Math.floor(Math.random() * bots.length)];
                 let message = '';
-                
+
                 // Choisir le message en fonction de l'argent du joueur
                 if (player.money > 1500 * 1.7) { // Plus de 170% de l'argent de départ
                     message = `😱 Il est trop en avance ${player.prenom} !`;
@@ -274,25 +298,25 @@ function movePlayer(playerIndex, steps) {
                     ];
                     message = messages[Math.floor(Math.random() * messages.length)];
                 }
-                
+
                 addChatMessage(message, randomBot.prenom, false, true);
             }
         }, 1000);
     }
-    
+
     // Animation du déplacement case par case
     let currentStep = 0;
     const moveInterval = setInterval(() => {
         currentStep++;
         const tempPosition = (startPosition + currentStep) % 40;
-        
+
         // Mettre à jour temporairement la position pour l'animation
         const tempPlayers = [...players];
         tempPlayers[playerIndex] = { ...player, position: tempPosition };
-        
+
         // Retirer tous les pions et afficher avec la position temporaire
         document.querySelectorAll('.player-token').forEach(token => token.remove());
-        
+
         // Grouper les joueurs par position pour l'animation
         const playersByPosition = {};
         tempPlayers.forEach((p, index) => {
@@ -301,7 +325,7 @@ function movePlayer(playerIndex, steps) {
             }
             playersByPosition[p.position].push({ player: p, originalIndex: index });
         });
-        
+
         // Afficher les pions groupés
         Object.keys(playersByPosition).forEach(position => {
             const cell = document.querySelector(`[data-position="${position}"]`);
@@ -317,7 +341,7 @@ function movePlayer(playerIndex, steps) {
                 });
             }
         });
-        
+
         if (currentStep === steps) {
             clearInterval(moveInterval);
             player.position = newPosition;
@@ -354,7 +378,7 @@ function showFloatingMessage(text, type) {
         border: 3px solid rgba(255, 255, 255, 0.3);
     `;
     document.body.appendChild(message);
-    
+
     setTimeout(() => message.remove(), 2500);
 }
 
@@ -363,7 +387,7 @@ function checkLanding(playerIndex) {
     const player = players[playerIndex];
     const position = player.position;
     const cell = document.querySelector(`[data-position="${position}"]`);
-    
+
     // Effet visuel sur la case
     if (cell) {
         cell.style.transform = 'scale(1.1)';
@@ -373,16 +397,16 @@ function checkLanding(playerIndex) {
             cell.style.boxShadow = '';
         }, 1000);
     }
-    
+
     console.log(`${player.prenom} arrive sur la case ${position}`);
-    
+
     // Logique des cases spéciales
     if (position === 0) {
         // Tomber pile sur la case DÉPART = bonus de 250€ avec animation
         showStartBonusDialog(playerIndex);
     } else if (position === 10) {
         showNotification(`${player.emoji} ${player.prenom} visite la prison`, 'info');
-        
+
         // Passer au joueur suivant
         setTimeout(() => {
             checkNextPlayer();
@@ -392,7 +416,7 @@ function checkLanding(playerIndex) {
         const bonus = Math.floor(Math.random() * 100) + 50;
         player.money += bonus;
         showFloatingMessage(`+${bonus}€ BONUS PARC`, 'success');
-        
+
         // Passer au joueur suivant
         setTimeout(() => {
             checkNextPlayer();
@@ -402,10 +426,10 @@ function checkLanding(playerIndex) {
         const jailTurns = players.length <= 3 ? 2 : 3;
         player.inJail = true;
         player.jailTurns = jailTurns;
-        
+
         showNotification(`${player.emoji} ${player.prenom} va en prison pour ${jailTurns} tour(s)!`, 'error');
         showFloatingMessage(`🚔 EN PRISON ${jailTurns} TOUR(S)!`, 'error');
-        
+
         // Message du bot s'il va en prison
         if (player.isBot) {
             setTimeout(() => {
@@ -419,11 +443,11 @@ function checkLanding(playerIndex) {
                 addChatMessage(randomMessage, player.prenom, false, true);
             }, 500);
         }
-        
+
         setTimeout(() => {
             player.position = 10;
             displayTokens();
-            
+
             // Passer au joueur suivant après être allé en prison
             setTimeout(() => {
                 checkNextPlayer();
@@ -435,7 +459,7 @@ function checkLanding(playerIndex) {
         player.money -= taxAmount;
         showNotification(`${player.emoji} ${player.prenom} paie ${taxAmount}€ d'impôts!`, 'error');
         showFloatingMessage(`-${taxAmount}€ IMPÔTS`, 'error');
-        
+
         // Passer au joueur suivant après avoir payé les impôts
         setTimeout(() => {
             checkNextPlayer();
@@ -450,23 +474,23 @@ function checkLanding(playerIndex) {
         // Vérifier si c'est une propriété achetable
         checkPropertyPurchase(playerIndex, position, cell);
     }
-    
+
     displayPlayers();
 }
 
 // Gérer l'achat de propriété
 function checkPropertyPurchase(playerIndex, position, cell) {
     const player = players[playerIndex];
-    
+
     // Positions des propriétés achetables (pas les coins, chance, communauté, impôts)
     const specialPositions = [0, 2, 4, 7, 10, 17, 20, 22, 30, 33, 36, 38];
     if (specialPositions.includes(position)) return;
-    
+
     // Récupérer les infos de la propriété
     const propertyName = cell.querySelector('.cell-name')?.textContent || 'Propriété';
     const propertyPrice = cell.querySelector('.cell-price')?.textContent || '0€';
     const price = parseInt(propertyPrice.replace('€', ''));
-    
+
     // Vérifier si la propriété est déjà achetée
     if (cell.hasAttribute('data-owner')) {
         const owner = cell.getAttribute('data-owner');
@@ -484,17 +508,17 @@ function checkPropertyPurchase(playerIndex, position, cell) {
             const rentPercent = hasHouse ? 1.0 : 0.70; // 100% si maison, 70% sinon
             const rent = Math.floor(price * rentPercent);
             player.money -= rent;
-            
+
             // Trouver le propriétaire et lui donner l'argent
             const ownerPlayer = players.find(p => p.prenom === owner);
             if (ownerPlayer) {
                 ownerPlayer.money += rent;
             }
-            
+
             const houseEmoji = hasHouse ? '🏠 ' : '';
             showNotification(`${player.emoji} ${player.prenom} paie ${rent}€ de loyer ${houseEmoji}à ${owner}`, 'error');
             showFloatingMessage(`-${rent}€ ${houseEmoji}LOYER`, 'error');
-            
+
             // Passer au joueur suivant après le paiement du loyer
             setTimeout(() => {
                 checkNextPlayer();
@@ -502,7 +526,7 @@ function checkPropertyPurchase(playerIndex, position, cell) {
         }
         return;
     }
-    
+
     // Si c'est un bot, décider automatiquement
     if (player.isBot) {
         if (player.money >= price && botDecideToBuy(player, price)) {
@@ -511,7 +535,7 @@ function checkPropertyPurchase(playerIndex, position, cell) {
             cell.setAttribute('data-owner', player.prenom);
             cell.style.borderColor = '#667eea';
             cell.style.borderWidth = '4px';
-            
+
             // Ajouter un indicateur de propriétaire
             const ownerBadge = document.createElement('div');
             ownerBadge.textContent = player.emoji;
@@ -523,17 +547,17 @@ function checkPropertyPurchase(playerIndex, position, cell) {
                 z-index: 5;
             `;
             cell.appendChild(ownerBadge);
-            
+
             showNotification(`${player.emoji} ${player.prenom} a acheté ${propertyName}!`, 'success');
             displayPlayers();
-            
+
             // Passer au joueur suivant après l'achat du bot
             setTimeout(() => {
                 checkNextPlayer();
             }, 2000);
         } else {
             showNotification(`${player.emoji} ${player.prenom} n'achète pas ${propertyName}`, 'info');
-            
+
             // Passer au joueur suivant si le bot n'achète pas
             setTimeout(() => {
                 checkNextPlayer();
@@ -548,7 +572,7 @@ function checkPropertyPurchase(playerIndex, position, cell) {
 // Afficher la boîte de dialogue d'achat
 function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, price) {
     const player = players[playerIndex];
-    
+
     const dialog = document.createElement('div');
     dialog.style.cssText = `
         position: fixed;
@@ -564,7 +588,7 @@ function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, p
         border: 3px solid rgba(102, 126, 234, 0.3);
         min-width: 400px;
     `;
-    
+
     dialog.innerHTML = `
         <h2 style="color: #333; margin-bottom: 20px; font-size: 2em;">🏠 ${propertyName}</h2>
         <p style="color: #555; font-size: 1.5em; margin-bottom: 30px; font-weight: 600;">Prix: ${price}€</p>
@@ -594,9 +618,9 @@ function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, p
             ">❌ Passer</button>
         </div>
     `;
-    
+
     document.body.appendChild(dialog);
-    
+
     // Bouton Acheter
     dialog.querySelector('#btn-buy').addEventListener('click', () => {
         if (player.money >= price) {
@@ -604,7 +628,7 @@ function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, p
             cell.setAttribute('data-owner', player.prenom);
             cell.style.borderColor = '#11998e';
             cell.style.borderWidth = '4px';
-            
+
             // Ajouter un indicateur de propriétaire
             const ownerBadge = document.createElement('div');
             ownerBadge.textContent = player.emoji;
@@ -617,7 +641,7 @@ function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, p
                 z-index: 5;
             `;
             cell.appendChild(ownerBadge);
-            
+
             showNotification(`${player.emoji} ${player.prenom} a acheté ${propertyName}!`, 'success');
             showFloatingMessage(`🏠 PROPRIÉTÉ ACHETÉE!`, 'success');
             displayPlayers();
@@ -626,18 +650,18 @@ function showPropertyPurchaseDialog(playerIndex, position, cell, propertyName, p
             showFloatingMessage(`💰 FONDS INSUFFISANTS!`, 'error');
         }
         dialog.remove();
-        
+
         // Passer automatiquement au joueur suivant
         setTimeout(() => {
             checkNextPlayer();
         }, 1000);
     });
-    
+
     // Bouton Passer
     dialog.querySelector('#btn-pass').addEventListener('click', () => {
         showNotification(`${player.emoji} ${player.prenom} n'achète pas ${propertyName}`, 'info');
         dialog.remove();
-        
+
         // Passer automatiquement au joueur suivant
         setTimeout(() => {
             checkNextPlayer();
@@ -683,7 +707,7 @@ const chanceCards = [
 // Afficher le bonus de la case DÉPART avec animation
 function showStartBonusDialog(playerIndex) {
     const player = players[playerIndex];
-    
+
     // Créer un fond sombre avec effet
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -698,7 +722,7 @@ function showStartBonusDialog(playerIndex) {
     `;
     document.body.appendChild(overlay);
     setTimeout(() => overlay.style.background = 'rgba(0, 0, 0, 0.85)', 50);
-    
+
     // Créer des particules d'étoiles
     for (let i = 0; i < 30; i++) {
         const star = document.createElement('div');
@@ -706,7 +730,7 @@ function showStartBonusDialog(playerIndex) {
         const y = Math.random() * window.innerHeight;
         const size = Math.random() * 4 + 2;
         const delay = Math.random() * 0.5;
-        
+
         star.style.cssText = `
             position: fixed;
             left: ${x}px;
@@ -723,7 +747,7 @@ function showStartBonusDialog(playerIndex) {
         document.body.appendChild(star);
         setTimeout(() => star.remove(), 5000);
     }
-    
+
     // Ajouter animation CSS pour les étoiles
     if (!document.getElementById('star-animation')) {
         const style = document.createElement('style');
@@ -749,7 +773,7 @@ function showStartBonusDialog(playerIndex) {
         `;
         document.head.appendChild(style);
     }
-    
+
     // Animation de la carte avec effet arc-en-ciel
     const animatedCard = document.createElement('div');
     animatedCard.style.cssText = `
@@ -773,16 +797,16 @@ function showStartBonusDialog(playerIndex) {
     `;
     animatedCard.innerHTML = `<span style="filter: drop-shadow(0 0 30px rgba(255,255,255,1)); animation: flagWave 0.5s ease-in-out infinite;">🏁</span>`;
     document.body.appendChild(animatedCard);
-    
+
     // Animation d'apparition explosive
     setTimeout(() => {
         animatedCard.style.transform = 'translate(-50%, -50%) scale(3) rotate(720deg)';
     }, 100);
-    
+
     // Afficher le contenu
     setTimeout(() => {
         animatedCard.remove();
-        
+
         const dialog = document.createElement('div');
         dialog.style.cssText = `
             position: fixed;
@@ -800,7 +824,7 @@ function showStartBonusDialog(playerIndex) {
             max-width: 600px;
             transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         `;
-        
+
         dialog.innerHTML = `
             <div style="font-size: 6em; margin-bottom: 20px; animation: bounce 0.8s ease infinite; filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));">🏁</div>
             <h2 style="
@@ -851,7 +875,7 @@ function showStartBonusDialog(playerIndex) {
                 letter-spacing: 2px;
             ">🎉 RÉCUPÉRER 🎉</button>
         `;
-        
+
         // Ajouter animations supplémentaires
         const shineStyle = document.createElement('style');
         shineStyle.textContent = `
@@ -865,14 +889,14 @@ function showStartBonusDialog(playerIndex) {
             }
         `;
         document.head.appendChild(shineStyle);
-        
+
         document.body.appendChild(dialog);
-        
+
         // Animation d'apparition du dialogue
         setTimeout(() => {
             dialog.style.transform = 'translate(-50%, -50%) scale(1)';
         }, 50);
-        
+
         // Effet hover sur le bouton
         const btnOk = dialog.querySelector('#btn-start-ok');
         btnOk.addEventListener('mouseenter', () => {
@@ -883,7 +907,7 @@ function showStartBonusDialog(playerIndex) {
             btnOk.style.transform = 'scale(1)';
             btnOk.style.boxShadow = '0 8px 20px rgba(17, 153, 142, 0.4)';
         });
-        
+
         // Appliquer le bonus
         btnOk.addEventListener('click', () => {
             dialog.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -892,17 +916,17 @@ function showStartBonusDialog(playerIndex) {
                 dialog.remove();
                 overlay.remove();
             }, 300);
-            
+
             player.money += 250;
             showFloatingMessage('+250€ CASE DÉPART!', 'success');
             displayPlayers();
-            
+
             // Passer au joueur suivant
             setTimeout(() => {
                 checkNextPlayer();
             }, 1500);
         });
-        
+
         // Si c'est un bot, cliquer automatiquement après 2 secondes
         if (player.isBot) {
             setTimeout(() => {
@@ -915,7 +939,7 @@ function showStartBonusDialog(playerIndex) {
 // Afficher le bonus pour passage par la case DÉPART (+200€) avec animation
 function showPassStartDialog(playerIndex, onClose) {
     const player = players[playerIndex];
-    
+
     // Créer un fond sombre avec effet
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -930,7 +954,7 @@ function showPassStartDialog(playerIndex, onClose) {
     `;
     document.body.appendChild(overlay);
     setTimeout(() => overlay.style.background = 'rgba(0, 0, 0, 0.75)', 50);
-    
+
     // Créer des particules d'étoiles (moins que pour le jackpot)
     for (let i = 0; i < 20; i++) {
         const star = document.createElement('div');
@@ -947,7 +971,7 @@ function showPassStartDialog(playerIndex, onClose) {
         document.body.appendChild(star);
         setTimeout(() => star.remove(), 4000);
     }
-    
+
     // Animation de la carte
     const animatedCard = document.createElement('div');
     animatedCard.style.cssText = `
@@ -970,16 +994,16 @@ function showPassStartDialog(playerIndex, onClose) {
     `;
     animatedCard.innerHTML = `<span style="filter: drop-shadow(0 0 20px rgba(255,255,255,0.8));">🏁</span>`;
     document.body.appendChild(animatedCard);
-    
+
     // Animation d'apparition
     setTimeout(() => {
         animatedCard.style.transform = 'translate(-50%, -50%) scale(2.5) rotate(360deg)';
     }, 100);
-    
+
     // Afficher le contenu
     setTimeout(() => {
         animatedCard.remove();
-        
+
         const dialog = document.createElement('div');
         dialog.style.cssText = `
             position: fixed;
@@ -997,7 +1021,7 @@ function showPassStartDialog(playerIndex, onClose) {
             max-width: 550px;
             transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         `;
-        
+
         dialog.innerHTML = `
             <div style="font-size: 5em; margin-bottom: 20px; animation: bounce 0.8s ease infinite; filter: drop-shadow(0 0 15px rgba(17,153,142,0.8));">🏁</div>
             <h2 style="
@@ -1048,14 +1072,14 @@ function showPassStartDialog(playerIndex, onClose) {
                 letter-spacing: 1.5px;
             ">💰 RÉCUPÉRER 💰</button>
         `;
-        
+
         document.body.appendChild(dialog);
-        
+
         // Animation d'apparition du dialogue
         setTimeout(() => {
             dialog.style.transform = 'translate(-50%, -50%) scale(1)';
         }, 50);
-        
+
         // Effet hover sur le bouton
         const btnOk = dialog.querySelector('#btn-pass-ok');
         btnOk.addEventListener('mouseenter', () => {
@@ -1066,7 +1090,7 @@ function showPassStartDialog(playerIndex, onClose) {
             btnOk.style.transform = 'scale(1)';
             btnOk.style.boxShadow = '0 8px 25px rgba(17, 153, 142, 0.5)';
         });
-        
+
         // Action du bouton
         btnOk.addEventListener('click', () => {
             dialog.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -1074,18 +1098,18 @@ function showPassStartDialog(playerIndex, onClose) {
             setTimeout(() => {
                 dialog.remove();
                 overlay.remove();
-                
+
                 // Appeler le callback pour continuer le flux du jeu
                 if (onClose) {
                     onClose();
                 }
             }, 300);
-            
+
             player.money += 200;
             showFloatingMessage('+200€ PASSAGE!', 'success');
             displayPlayers();
         });
-        
+
         // Si c'est un bot, cliquer automatiquement après 1.5 secondes
         if (player.isBot) {
             setTimeout(() => {
@@ -1099,14 +1123,14 @@ function showPassStartDialog(playerIndex, onClose) {
 function drawCommunityCard(playerIndex) {
     const player = players[playerIndex];
     const card = communityCards[Math.floor(Math.random() * communityCards.length)];
-    
+
     // Messages des bots quand quelqu'un tire une carte
     setTimeout(() => {
         const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
         if (otherBots.length > 0) {
             const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
             let message = '';
-            
+
             if (player.isBot) {
                 const messages = [
                     `🎲 La chance va tourner pour ${player.prenom} !`,
@@ -1123,11 +1147,11 @@ function drawCommunityCard(playerIndex) {
                 ];
                 message = messages[Math.floor(Math.random() * messages.length)];
             }
-            
+
             addChatMessage(message, randomBot.prenom, false, true);
         }
     }, 300);
-    
+
     if (player.isBot) {
         // Pour les bots, juste afficher un message et appliquer l'effet
         showNotification(`${player.emoji} ${player.prenom} tire une carte Caisse: ${card.text}`, 'success');
@@ -1143,14 +1167,14 @@ function drawCommunityCard(playerIndex) {
 function drawChanceCard(playerIndex) {
     const player = players[playerIndex];
     const card = chanceCards[Math.floor(Math.random() * chanceCards.length)];
-    
+
     // Messages des bots quand quelqu'un tire une carte Chance
     setTimeout(() => {
         const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
         if (otherBots.length > 0) {
             const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
             let message = '';
-            
+
             if (player.isBot) {
                 const messages = [
                     `✨ La chance va sourire à ${player.prenom} !`,
@@ -1168,11 +1192,11 @@ function drawChanceCard(playerIndex) {
                 ];
                 message = messages[Math.floor(Math.random() * messages.length)];
             }
-            
+
             addChatMessage(message, randomBot.prenom, false, true);
         }
     }, 300);
-    
+
     if (player.isBot) {
         // Pour les bots, juste afficher un message et appliquer l'effet
         showNotification(`${player.emoji} ${player.prenom} tire une carte Chance: ${card.text}`, 'success');
@@ -1188,7 +1212,7 @@ function drawChanceCard(playerIndex) {
 function showCardDialog(playerIndex, card, title) {
     const player = players[playerIndex];
     const isChance = title.includes('Chance');
-    
+
     // Créer un fond sombre
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -1203,12 +1227,12 @@ function showCardDialog(playerIndex, card, title) {
     `;
     document.body.appendChild(overlay);
     setTimeout(() => overlay.style.background = 'rgba(0, 0, 0, 0.7)', 50);
-    
+
     // Créer la carte animée qui part du paquet
     const animatedCard = document.createElement('div');
     const deckElement = document.querySelector(isChance ? '.card-deck.chance' : '.card-deck.community');
     const deckRect = deckElement.getBoundingClientRect();
-    
+
     // Ajouter des styles pour les animations
     const style = document.createElement('style');
     style.textContent = `
@@ -1222,7 +1246,7 @@ function showCardDialog(playerIndex, card, title) {
         }
     `;
     document.head.appendChild(style);
-    
+
     animatedCard.style.cssText = `
         position: fixed;
         left: ${deckRect.left}px;
@@ -1244,7 +1268,7 @@ function showCardDialog(playerIndex, card, title) {
     `;
     animatedCard.innerHTML = `<span style="display: inline-block; animation: iconBounce 0.6s ease-in-out infinite;">${isChance ? '🎲' : '📦'}</span>`;
     document.body.appendChild(animatedCard);
-    
+
     // Créer des particules autour du paquet
     for (let i = 0; i < 12; i++) {
         const particle = document.createElement('div');
@@ -1271,7 +1295,7 @@ function showCardDialog(playerIndex, card, title) {
         }, 50);
         setTimeout(() => particle.remove(), 500);
     }
-    
+
     // Effet de lueur intense sur le paquet
     deckElement.style.transform = 'scale(1.2) rotate(10deg)';
     deckElement.style.boxShadow = `0 0 60px ${isChance ? 'rgba(17, 153, 142, 1)' : 'rgba(102, 126, 234, 1)'}, 0 0 120px ${isChance ? 'rgba(17, 153, 142, 0.6)' : 'rgba(102, 126, 234, 0.6)'}`;
@@ -1281,7 +1305,7 @@ function showCardDialog(playerIndex, card, title) {
         deckElement.style.boxShadow = '';
         deckElement.style.filter = '';
     }, 400);
-    
+
     // Animation: déplacer vers le centre avec rotation 3D spectaculaire
     setTimeout(() => {
         animatedCard.style.left = '50%';
@@ -1289,18 +1313,18 @@ function showCardDialog(playerIndex, card, title) {
         animatedCard.style.transform = 'translate(-50%, -50%) scale(2.8) rotate(720deg) rotateX(15deg)';
         animatedCard.style.boxShadow = `0 40px 120px rgba(0, 0, 0, 1), 0 0 100px ${isChance ? 'rgba(17, 153, 142, 1)' : 'rgba(102, 126, 234, 1)'}`;
     }, 100);
-    
+
     // Retourner la carte après 1.2s avec flip 3D
     setTimeout(() => {
         animatedCard.style.transition = 'all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
         animatedCard.style.transform = 'translate(-50%, -50%) scale(2.8) rotateY(90deg)';
         animatedCard.style.animation = 'none';
     }, 1200);
-    
+
     // Afficher le contenu de la carte
     setTimeout(() => {
         animatedCard.remove();
-        
+
         const dialog = document.createElement('div');
         dialog.style.cssText = `
             position: fixed;
@@ -1318,7 +1342,7 @@ function showCardDialog(playerIndex, card, title) {
             max-width: 600px;
             transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         `;
-        
+
         const cardIcon = isChance ? '🎲' : '📦';
         dialog.innerHTML = `
             <div style="font-size: 4em; margin-bottom: 20px; animation: bounce 1s ease infinite;">${cardIcon}</div>
@@ -1349,14 +1373,14 @@ function showCardDialog(playerIndex, card, title) {
                 border: 2px solid rgba(255, 255, 255, 0.3);
             ">✓ OK</button>
         `;
-        
+
         document.body.appendChild(dialog);
-        
+
         // Animation de retournement de la carte
         setTimeout(() => {
             dialog.style.transform = 'translate(-50%, -50%) rotateY(0deg) scale(1)';
         }, 50);
-        
+
         // Effet hover sur le bouton
         const btnOk = dialog.querySelector('#btn-card-ok');
         btnOk.addEventListener('mouseenter', () => {
@@ -1367,7 +1391,7 @@ function showCardDialog(playerIndex, card, title) {
             btnOk.style.transform = 'scale(1)';
             btnOk.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.4)';
         });
-        
+
         // Appliquer l'effet de la carte
         btnOk.addEventListener('click', () => {
             dialog.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -1377,13 +1401,13 @@ function showCardDialog(playerIndex, card, title) {
                 overlay.remove();
             }, 300);
             applyCardEffect(playerIndex, card);
-            
+
             // Passer automatiquement au joueur suivant après la carte
             setTimeout(() => {
                 checkNextPlayer();
             }, 1500);
         });
-        
+
         // Si c'est un bot, cliquer automatiquement sur OK après 2 secondes
         const player = players[playerIndex];
         if (player.isBot) {
@@ -1397,14 +1421,14 @@ function showCardDialog(playerIndex, card, title) {
 // Appliquer l'effet de la carte
 function applyCardEffect(playerIndex, card) {
     const player = players[playerIndex];
-    
+
     // Réactions des bots selon le type de carte
     setTimeout(() => {
         const otherBots = players.filter(p => p.isBot && p.prenom !== player.prenom);
         if (otherBots.length > 0) {
             const randomBot = otherBots[Math.floor(Math.random() * otherBots.length)];
             let message = '';
-            
+
             // Cartes avec gains d'argent importants (150€+)
             if (card.amount >= 150) {
                 const messages = [
@@ -1441,13 +1465,13 @@ function applyCardEffect(playerIndex, card) {
                 ];
                 message = messages[Math.floor(Math.random() * messages.length)];
             }
-            
+
             if (message) {
                 addChatMessage(message, randomBot.prenom, false, true);
             }
         }
     }, 800);
-    
+
     if (card.amount !== 0) {
         player.money += card.amount;
         if (card.amount > 0) {
@@ -1456,10 +1480,10 @@ function applyCardEffect(playerIndex, card) {
             showFloatingMessage(`${card.amount}€`, 'error');
         }
     }
-    
+
     // Variable pour savoir s'il faut appeler checkNextPlayer à la fin
     let needsNextPlayer = true;
-    
+
     if (card.special) {
         switch (card.special) {
             case 'get-jail-card':
@@ -1474,7 +1498,7 @@ function applyCardEffect(playerIndex, card) {
                     player.jailTurns = players.length <= 3 ? 2 : 3;
                     displayTokens();
                     showNotification(`${player.emoji} ${player.prenom} va en prison pour ${player.jailTurns} tour(s)!`, 'error');
-                    
+
                     // Message du bot s'il va en prison
                     if (player.isBot) {
                         setTimeout(() => {
@@ -1488,7 +1512,7 @@ function applyCardEffect(playerIndex, card) {
                             addChatMessage(randomMessage, player.prenom, false, true);
                         }, 300);
                     }
-                    
+
                     // Passer au joueur suivant après être allé en prison
                     if (player.isBot) {
                         setTimeout(() => checkNextPlayer(), 1000);
@@ -1502,7 +1526,7 @@ function applyCardEffect(playerIndex, card) {
                     player.money += 200;
                     displayTokens();
                     showFloatingMessage('+200€ DÉPART', 'success');
-                    
+
                     // Passer au joueur suivant
                     if (player.isBot) {
                         setTimeout(() => checkNextPlayer(), 1000);
@@ -1542,9 +1566,9 @@ function applyCardEffect(playerIndex, card) {
                 break;
         }
     }
-    
+
     displayPlayers();
-    
+
     // Si c'est un bot et qu'on doit passer au joueur suivant
     if (player.isBot && needsNextPlayer) {
         setTimeout(() => {
@@ -1572,7 +1596,7 @@ function showNotification(text, type) {
         animation: slideInRight 0.5s ease-out;
     `;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.5s ease-out';
         setTimeout(() => notification.remove(), 500);
@@ -1582,7 +1606,7 @@ function showNotification(text, type) {
 // Afficher le dialogue de prison avec les options
 function showJailDialog(playerIndex) {
     const player = players[playerIndex];
-    
+
     // Si c'est un bot, décider automatiquement
     if (player.isBot) {
         // Priorité: utiliser carte gratuite > payer si assez d'argent > attendre
@@ -1595,7 +1619,7 @@ function showJailDialog(playerIndex) {
         }
         return;
     }
-    
+
     // Pour les joueurs humains, afficher le dialogue
     const dialog = document.createElement('div');
     dialog.style.cssText = `
@@ -1612,7 +1636,7 @@ function showJailDialog(playerIndex) {
         border: 3px solid #e63946;
         min-width: 500px;
     `;
-    
+
     dialog.innerHTML = `
         <h2 style="color: #e63946; margin-bottom: 20px; font-size: 2.5em; text-shadow: 0 0 20px rgba(230, 57, 70, 0.8);">🔒 PRISON</h2>
         <p style="color: #fff; font-size: 1.3em; margin-bottom: 10px;">Vous êtes en prison!</p>
@@ -1636,7 +1660,7 @@ function showJailDialog(playerIndex) {
                 box-shadow: 0 5px 15px rgba(6, 255, 165, 0.3);
                 ${player.jailFreeCards === 0 ? 'opacity: 0.5; cursor: not-allowed;' : ''}
             " ${player.jailFreeCards === 0 ? 'disabled' : ''}>🎫 Utiliser une carte (Gratuit)</button>
-            
+
             <button id="btn-pay-jail" style="
                 padding: 15px 30px;
                 background: linear-gradient(135deg, #ffbe0b 0%, #fb5607 100%);
@@ -1649,7 +1673,7 @@ function showJailDialog(playerIndex) {
                 box-shadow: 0 5px 15px rgba(255, 190, 11, 0.3);
                 ${player.money < 50 ? 'opacity: 0.5; cursor: not-allowed;' : ''}
             " ${player.money < 50 ? 'disabled' : ''}>💰 Payer 50€ pour sortir</button>
-            
+
             <button id="btn-wait-jail" style="
                 padding: 15px 30px;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1663,9 +1687,9 @@ function showJailDialog(playerIndex) {
             ">⏳ Attendre (Passer le tour)</button>
         </div>
     `;
-    
+
     document.body.appendChild(dialog);
-    
+
     // Bouton utiliser carte
     if (player.jailFreeCards > 0) {
         dialog.querySelector('#btn-use-card').addEventListener('click', () => {
@@ -1673,7 +1697,7 @@ function showJailDialog(playerIndex) {
             useJailCard(playerIndex);
         });
     }
-    
+
     // Bouton payer
     if (player.money >= 50) {
         dialog.querySelector('#btn-pay-jail').addEventListener('click', () => {
@@ -1681,7 +1705,7 @@ function showJailDialog(playerIndex) {
             payJailFee(playerIndex);
         });
     }
-    
+
     // Bouton attendre
     dialog.querySelector('#btn-wait-jail').addEventListener('click', () => {
         dialog.remove();
@@ -1695,11 +1719,11 @@ function useJailCard(playerIndex) {
     player.jailFreeCards--;
     player.inJail = false;
     player.jailTurns = 0;
-    
+
     showNotification(`${player.emoji} ${player.prenom} utilise une carte et sort de prison!`, 'success');
     showFloatingMessage(`🎫 CARTE UTILISÉE`, 'success');
     displayPlayers();
-    
+
     // Lancer les dés automatiquement
     setTimeout(() => {
         rollDice();
@@ -1712,11 +1736,11 @@ function payJailFee(playerIndex) {
     player.money -= 50;
     player.inJail = false;
     player.jailTurns = 0;
-    
+
     showNotification(`${player.emoji} ${player.prenom} paie 50€ et sort de prison!`, 'success');
     showFloatingMessage(`-50€ CAUTION`, 'error');
     displayPlayers();
-    
+
     // Lancer les dés automatiquement
     setTimeout(() => {
         rollDice();
@@ -1726,7 +1750,7 @@ function payJailFee(playerIndex) {
 // Attendre en prison (passer le tour)
 function waitInJail(playerIndex) {
     const player = players[playerIndex];
-    
+
     player.jailTurns--;
     if (player.jailTurns === 0) {
         player.inJail = false;
@@ -1736,9 +1760,9 @@ function waitInJail(playerIndex) {
         showNotification(`${player.emoji} ${player.prenom} attend en prison... Encore ${player.jailTurns} tour(s)`, 'info');
         showFloatingMessage(`⏳ EN ATTENTE`, 'info');
     }
-    
+
     displayPlayers();
-    
+
     setTimeout(() => {
         nextPlayer();
     }, 2000);
@@ -1750,12 +1774,12 @@ function botDecideToBuy(player, price) {
     if (player.money < 800) {
         return Math.random() < 0.30;
     }
-    
+
     // Si le bot a entre 800€ et 1200€, il a 60% de chances d'acheter
     if (player.money < 1200) {
         return Math.random() < 0.60;
     }
-    
+
     // Si le bot a plus de 1200€, il a 85% de chances d'acheter
     return Math.random() < 0.85;
 }
@@ -1770,10 +1794,16 @@ function nextPlayer() {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     displayPlayers();
     updateCurrentTurn();
-    
+
+    // Synchroniser avec Firebase si on est l'hôte
+    if (window.gameSyncHelper && window.gameSyncHelper.isHost) {
+        window.gameSyncHelper.syncCurrentPlayer(currentPlayerIndex);
+        window.gameSyncHelper.syncPlayers(players);
+    }
+
     const currentPlayer = players[currentPlayerIndex];
     const diceButton = document.getElementById('btn-roll-dice');
-    
+
     // Si c'est le tour d'un bot, désactiver le bouton et jouer automatiquement
     if (currentPlayer.isBot) {
         diceButton.disabled = true;
@@ -1806,7 +1836,7 @@ document.querySelectorAll('.cell').forEach(cell => {
     cell.addEventListener('click', function() {
         const position = parseInt(this.getAttribute('data-position'));
         const owner = this.getAttribute('data-owner');
-        
+
         // Si la propriété appartient au joueur actuel
         if (owner && owner === players[currentPlayerIndex].prenom) {
             showPropertyManagementDialog(position, this);
@@ -1821,7 +1851,7 @@ function showPropertyManagementDialog(position, cell) {
     const propertyPrice = cell.querySelector('.cell-price')?.textContent || '0€';
     const price = parseInt(propertyPrice.replace('€', ''));
     const sellPrice = Math.floor(price * 0.75);
-    
+
     const dialog = document.createElement('div');
     dialog.style.cssText = `
         position: fixed;
@@ -1837,10 +1867,10 @@ function showPropertyManagementDialog(position, cell) {
         border: 3px solid rgba(17, 153, 142, 0.5);
         min-width: 400px;
     `;
-    
+
     const hasHouse = cell.hasAttribute('data-has-house');
     const houseStatus = hasHouse ? '✅ Maison construite' : '❌ Pas de maison';
-    
+
     dialog.innerHTML = `
         <h2 style="color: #11998e; margin-bottom: 20px; font-size: 2em;">🏠 ${propertyName}</h2>
         <p style="color: #555; font-size: 1.3em; margin-bottom: 15px; font-weight: 600;">Cette propriété est à vous!</p>
@@ -1895,15 +1925,15 @@ function showPropertyManagementDialog(position, cell) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(dialog);
-    
+
     // Bouton Construire une maison
     if (!hasHouse && player.money >= 50) {
         dialog.querySelector('#btn-build-house').addEventListener('click', () => {
             player.money -= 50;
             cell.setAttribute('data-has-house', 'true');
-            
+
             // Ajouter un badge maison
             const houseBadge = document.createElement('div');
             houseBadge.textContent = '🏠';
@@ -1917,14 +1947,14 @@ function showPropertyManagementDialog(position, cell) {
                 filter: drop-shadow(0 0 5px rgba(6, 255, 165, 0.8));
             `;
             cell.appendChild(houseBadge);
-            
+
             showNotification(`${player.emoji} ${player.prenom} a construit une maison sur ${propertyName}!`, 'success');
             showFloatingMessage(`🏠 MAISON CONSTRUITE`, 'success');
             displayPlayers();
             dialog.remove();
         });
     }
-    
+
     // Bouton Vendre
     dialog.querySelector('#btn-sell-property').addEventListener('click', () => {
         player.money += sellPrice;
@@ -1932,19 +1962,19 @@ function showPropertyManagementDialog(position, cell) {
         cell.removeAttribute('data-has-house');
         cell.style.borderColor = '';
         cell.style.borderWidth = '';
-        
+
         // Retirer l'emoji du propriétaire et la maison
         const ownerBadge = cell.querySelector('.owner-badge');
         const houseBadge = cell.querySelector('.house-badge');
         if (ownerBadge) ownerBadge.remove();
         if (houseBadge) houseBadge.remove();
-        
+
         showNotification(`${player.emoji} ${player.prenom} a vendu ${propertyName} pour ${sellPrice}€!`, 'success');
         showFloatingMessage(`+${sellPrice}€ VENTE`, 'success');
         displayPlayers();
         dialog.remove();
     });
-    
+
     // Bouton Fermer
     dialog.querySelector('#btn-close-dialog').addEventListener('click', () => {
         dialog.remove();
@@ -1978,27 +2008,27 @@ const botWelcomeMessages = ['Salut !', 'Je suis chaud ! 🔥', 'Bonne chance ! �
 // Fonction pour ajouter un message au chat
 function addChatMessage(message, author = null, isSystem = false, isBot = false) {
     const messageDiv = document.createElement('div');
-    
+
     if (isSystem) {
         messageDiv.className = 'chat-message system';
         messageDiv.textContent = message;
     } else {
         const isCurrentUser = author === currentPlayer.prenom;
         messageDiv.className = `chat-message ${isCurrentUser ? 'user' : isBot ? 'bot' : 'other'}`;
-        
+
         const authorSpan = document.createElement('div');
         authorSpan.className = 'chat-message-author';
         authorSpan.textContent = `${author}:`;
-        
+
         const textSpan = document.createElement('div');
         textSpan.textContent = message;
-        
+
         messageDiv.appendChild(authorSpan);
         messageDiv.appendChild(textSpan);
     }
-    
+
     chatMessages.appendChild(messageDiv);
-    
+
     // Scroller automatiquement vers le bas
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -2006,15 +2036,15 @@ function addChatMessage(message, author = null, isSystem = false, isBot = false)
 // Envoyer un message
 function sendChatMessage() {
     const message = chatInput.value.trim();
-    
+
     if (message === '') return;
-    
+
     // Ajouter le message au chat
     addChatMessage(message, currentPlayer.prenom);
-    
+
     // Réinitialiser l'input
     chatInput.value = '';
-    
+
     // Simuler une réponse d'un autre joueur (pour la démo)
     // Dans une vraie app multijoueur, ce serait envoyé via WebSocket
 }
@@ -2032,7 +2062,7 @@ chatInput.addEventListener('keypress', function(e) {
 // Messages d'accueil des bots au démarrage
 function sendBotWelcomeMessages() {
     const bots = players.filter(p => p.isBot);
-    
+
     bots.forEach((bot, index) => {
         if (index < botWelcomeMessages.length) {
             setTimeout(() => {

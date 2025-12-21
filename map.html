@@ -14,7 +14,7 @@
             <div class="game-header">
                 <h1>🎲 Monopoly</h1>
             </div>
-            
+
             <!-- Liste des joueurs -->
             <div class="players-panel">
                 <h3>Joueurs</h3>
@@ -253,7 +253,7 @@
                             <div class="card-label">Chance</div>
                         </div>
                     </div>
-                    
+
                     <!-- Zone de chat -->
                     <div class="game-chat">
                         <div class="chat-messages" id="chat-messages">
@@ -269,6 +269,16 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- Firebase Configuration & Manager -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-manager.js"></script>
+    <script src="game-sync-helper.js"></script>
+
+    <!-- Application Script -->
     <script src="map-script.js"></script>
 </body>
 </html>
