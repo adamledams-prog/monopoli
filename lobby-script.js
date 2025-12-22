@@ -81,6 +81,7 @@ function startRealtimeSync() {
         if (isHost) {
             document.getElementById('btn-add-bot').style.display = 'block';
             document.querySelector('.money-selector-section').style.display = 'block';
+            document.querySelector('.event-selector-section').style.display = 'block';
             document.getElementById('btn-start').style.display = 'block';
         }
     });
@@ -207,9 +208,13 @@ document.querySelectorAll('.event-btn').forEach(btn => {
         // Mettre à jour l'événement sélectionné
         selectedEvent = this.getAttribute('data-event');
         
+        console.log('✅ Événement sélectionné:', selectedEvent);
+        
         // Mettre à jour dans localStorage
         currentPlayer.eventType = selectedEvent;
         localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
+        
+        console.log('💾 Sauvegardé dans localStorage:', currentPlayer);
     });
 });
 
@@ -321,6 +326,7 @@ document.getElementById('btn-start').addEventListener('click', async function() 
         } else {
             // Mode local: sauvegarder dans localStorage
             localStorage.setItem('gamePlayers', JSON.stringify(players));
+            console.log('💾 Joueurs sauvegardés:', players);
         }
 
         // Rediriger vers le jeu

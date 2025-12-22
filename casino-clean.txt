@@ -1,0 +1,166 @@
+function triggerCasinoEvent() {
+    console.log('Declenchement du Casino!');
+    
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(139,0,0,0.98), rgba(0,0,0,0.98)); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; animation: fadeIn 0.5s; overflow: hidden;';
+    document.body.appendChild(overlay);
+    
+    for (let i = 0; i < 50; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.textContent = ['✨', '💰', '🪙', '💎', '⭐'][Math.floor(Math.random() * 5)];
+        sparkle.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: -50px; font-size: ' + (1.5 + Math.random() * 1.5) + 'em; animation: sparklefall ' + (3 + Math.random() * 4) + 's linear infinite; animation-delay: ' + (Math.random() * 5) + 's; opacity: ' + (0.4 + Math.random() * 0.4) + ';';
+        overlay.appendChild(sparkle);
+    }
+    
+    const title = document.createElement('div');
+    title.innerHTML = '<div style="text-align: center; color: #ffd700; font-size: 6em; font-weight: 900; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00; margin-bottom: 20px;">🎰 CASINO ROYAL 🎰</div><div style="text-align: center; color: #fff; font-size: 2em; margin-bottom: 20px;">✨ Tentez votre chance ! ✨</div><div style="text-align: center; color: #90ee90; font-size: 1.5em; margin-bottom: 30px;">💰 100 EUR • 💎 300 EUR • 🏆 500 EUR • 👑 JACKPOT 1000 EUR</div><div id="current-player-info" style="text-align: center; color: #ffd700; font-size: 2.5em; margin-bottom: 40px; font-weight: 900;">🎲 ' + players[0].emoji + ' ' + players[0].prenom + ' 🎲</div>';
+    overlay.appendChild(title);
+    
+    const container = document.createElement('div');
+    container.style.cssText = 'display: flex; justify-content: center; align-items: center;';
+    overlay.appendChild(container);
+    
+    const machine = document.createElement('div');
+    machine.style.cssText = 'background: linear-gradient(135deg, #1a0000, #8b0000, #ff4500, #8b0000, #1a0000); background-size: 400% 400%; padding: 50px; border-radius: 40px; border: 8px solid #ffd700; text-align: center; width: 500px; box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 60px rgba(255,215,0,0.5); animation: machineglow 3s ease-in-out infinite;';
+    machine.innerHTML = '<div style="font-size: 7em; margin-bottom: 30px;">🎰</div><div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px;"><div class="reel" style="background: linear-gradient(135deg, #000, #1a1a1a); padding: 30px 20px; border-radius: 20px; font-size: 5em; color: #ffd700; border: 5px solid #ffd700; min-height: 150px; width: 140px; display: flex; align-items: center; justify-content: center; font-weight: 900;">🎲</div><div class="reel" style="background: linear-gradient(135deg, #000, #1a1a1a); padding: 30px 20px; border-radius: 20px; font-size: 5em; color: #ffd700; border: 5px solid #ffd700; min-height: 150px; width: 140px; display: flex; align-items: center; justify-content: center; font-weight: 900;">🎲</div><div class="reel" style="background: linear-gradient(135deg, #000, #1a1a1a); padding: 30px 20px; border-radius: 20px; font-size: 5em; color: #ffd700; border: 5px solid #ffd700; min-height: 150px; width: 140px; display: flex; align-items: center; justify-content: center; font-weight: 900;">🎲</div></div><div class="result-display" style="font-size: 2.5em; color: #ffd700; min-height: 60px; margin-bottom: 20px; font-weight: 900;"></div><button class="play" style="background: linear-gradient(135deg, #ffd700, #ff8c00); background-size: 300% 300%; color: #000; border: none; padding: 25px 60px; border-radius: 25px; font-size: 2.2em; font-weight: 900; cursor: pointer; width: 100%; animation: buttongradient 2s ease infinite; border: 4px solid rgba(255,255,255,0.3);">🎲 JOUER MAINTENANT ! 🎲</button>';
+    container.appendChild(machine);
+    
+    const style = document.createElement('style');
+    style.textContent = '@keyframes sparklefall { from { transform: translateY(0) rotate(0); opacity: 0.8; } to { transform: translateY(100vh) rotate(720deg); opacity: 0; } } @keyframes machineglow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } } @keyframes buttongradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes winFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } } @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); } 20%, 40%, 60%, 80% { transform: translateX(10px); } }';
+    document.head.appendChild(style);
+    
+    const reels = machine.querySelectorAll('.reel');
+    const resultDisplay = machine.querySelector('.result-display');
+    const btn = machine.querySelector('.play');
+    const playerInfo = document.getElementById('current-player-info');
+    
+    let currentIndex = 0;
+    const stats = {};
+    players.forEach((_, i) => { stats[i] = { gain: 0 }; });
+    
+    const playTurn = () => {
+        const player = players[currentIndex];
+        playerInfo.innerHTML = '🎲 ' + player.emoji + ' ' + player.prenom + ' 🎲';
+        resultDisplay.innerHTML = '';
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.textContent = '🎰 EN COURS... 🎰';
+        
+        const symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '💎', '7', '👑', '🎁', '💰'];
+        
+        const spinReel = (reelElement, delay, finalSymbol) => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let spinCount = 0;
+                    const spinInterval = setInterval(() => {
+                        reelElement.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                        spinCount++;
+                        if (spinCount >= 15) {
+                            clearInterval(spinInterval);
+                            reelElement.textContent = finalSymbol;
+                            reelElement.style.animation = 'winFlash 0.3s ease-in-out 2';
+                            setTimeout(() => { reelElement.style.animation = ''; resolve(); }, 600);
+                        }
+                    }, 100);
+                }, delay);
+            });
+        };
+        
+        const rand = Math.random();
+        let gain = 0, result = '', resultColor = '', finalSymbols = [];
+        
+        if (rand < 0.25) {
+            gain = 0; result = '💔 PERDU 💔'; resultColor = '#ff0000'; finalSymbols = ['💔', '😢', '😭'];
+        } else if (rand < 0.55) {
+            gain = 100; result = '💰 +100 EUR 💰'; resultColor = '#90ee90'; finalSymbols = ['💰', '💰', '🪙'];
+        } else if (rand < 0.80) {
+            gain = 300; result = '💎 +300 EUR 💎'; resultColor = '#00bfff'; finalSymbols = ['💎', '💎', '⭐'];
+        } else if (rand < 0.95) {
+            gain = 500; result = '🏆 +500 EUR 🏆'; resultColor = '#ffd700'; finalSymbols = ['🏆', '🏆', '👑'];
+        } else {
+            gain = 1000; result = '👑 JACKPOT 1000 EUR 👑'; resultColor = '#ff00ff'; finalSymbols = ['👑', '👑', '👑'];
+        }
+        
+        Promise.all([
+            spinReel(reels[0], 0, finalSymbols[0]),
+            spinReel(reels[1], 400, finalSymbols[1]),
+            spinReel(reels[2], 800, finalSymbols[2])
+        ]).then(() => {
+            setTimeout(() => {
+                resultDisplay.innerHTML = result;
+                resultDisplay.style.color = resultColor;
+                stats[currentIndex].gain = gain;
+                
+                if (gain > 0) {
+                    player.money += gain;
+                    displayPlayers();
+                    
+                    if (gain >= 300) {
+                        const confettiCount = gain >= 1000 ? 50 : (gain >= 500 ? 35 : 25);
+                        for (let i = 0; i < confettiCount; i++) {
+                            const confetti = document.createElement('div');
+                            confetti.textContent = ['🎉', '🎊', '✨', '💫', '🌟', '⭐'][Math.floor(Math.random() * 6)];
+                            confetti.style.cssText = 'position: absolute; left: 50%; top: 50%; font-size: ' + (2 + Math.random() * 2) + 'em; animation: confettiExplode 2s ease-out forwards;';
+                            overlay.appendChild(confetti);
+                            setTimeout(() => confetti.remove(), 2000);
+                        }
+                    }
+                    
+                    if (gain >= 500) {
+                        machine.style.animation = 'shake 0.5s ease-in-out 3';
+                        setTimeout(() => { machine.style.animation = 'machineglow 3s ease-in-out infinite'; }, 1500);
+                    }
+                }
+            }, 300);
+            
+            setTimeout(() => {
+                currentIndex++;
+                
+                if (currentIndex < players.length) {
+                    reels.forEach(reel => { reel.textContent = '🎲'; reel.style.color = '#ffd700'; });
+                    resultDisplay.innerHTML = '';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.textContent = '🎲 JOUER MAINTENANT ! 🎲';
+                    
+                    if (players[currentIndex].isBot) {
+                        setTimeout(() => playTurn(), 1500);
+                    }
+                } else {
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        overlay.style.transition = 'opacity 1s';
+                        
+                        setTimeout(() => {
+                            overlay.remove();
+                            style.remove();
+                            
+                            players.forEach((player, i) => {
+                                const gain = stats[i].gain;
+                                if (gain >= 1000) {
+                                    addChatMessage('👑 ' + player.emoji + ' ' + player.prenom + ' a decroche le JACKPOT de ' + gain + ' EUR ! 👑', 'Systeme', true, false);
+                                } else if (gain >= 500) {
+                                    addChatMessage('🏆 ' + player.emoji + ' ' + player.prenom + ' a remporte ' + gain + ' EUR au casino !', 'Systeme', true, false);
+                                } else if (gain > 0) {
+                                    addChatMessage('💰 ' + player.emoji + ' ' + player.prenom + ' a gagne ' + gain + ' EUR au casino', 'Systeme', true, false);
+                                } else {
+                                    addChatMessage('💔 ' + player.emoji + ' ' + player.prenom + ' n\'a rien gagne', 'Systeme', true, false);
+                                }
+                            });
+                        }, 1000);
+                    }, 2500);
+                }
+            }, 3000);
+        });
+    };
+    
+    const confettiStyle = document.createElement('style');
+    confettiStyle.textContent = '@keyframes confettiExplode { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0); opacity: 1; } 100% { transform: translate(' + (Math.random() * 600 - 300) + 'px, ' + (Math.random() * 600 - 300) + 'px) rotate(' + (Math.random() * 1080) + 'deg) scale(2); opacity: 0; } }';
+    document.head.appendChild(confettiStyle);
+    
+    btn.onclick = playTurn;
+    
+    if (players[0].isBot) {
+        setTimeout(() => playTurn(), 1500);
+    }
+}

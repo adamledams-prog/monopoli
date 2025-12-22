@@ -1994,156 +1994,442 @@ function triggerCasinoEvent() {
     overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(139,0,0,0.98), rgba(0,0,0,0.98)); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; animation: fadeIn 0.5s; overflow: hidden;';
     document.body.appendChild(overlay);
     
+    // Ajouter des pièces d'or et paillettes qui tombent
     for (let i = 0; i < 50; i++) {
         const sparkle = document.createElement('div');
-        sparkle.textContent = ['✨', '💰', '🪙', '💎', '⭐'][Math.floor(Math.random() * 5)];
-        sparkle.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: -50px; font-size: ' + (1.5 + Math.random() * 1.5) + 'em; animation: sparklefall ' + (3 + Math.random() * 4) + 's linear infinite; animation-delay: ' + (Math.random() * 5) + 's; opacity: ' + (0.4 + Math.random() * 0.4) + ';';
+        const symbols = ['✨', '💰', '🪙', '💎', '⭐'];
+        sparkle.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        sparkle.style.cssText = `
+            position: absolute;
+            left: ${Math.random() * 100}%;
+            top: -50px;
+            font-size: ${1.5 + Math.random() * 1.5}em;
+            animation: sparklefall ${3 + Math.random() * 4}s linear infinite;
+            animation-delay: ${Math.random() * 5}s;
+            opacity: ${0.4 + Math.random() * 0.4};
+        `;
         overlay.appendChild(sparkle);
     }
     
+    // Titre animé avec néons
     const title = document.createElement('div');
-    title.innerHTML = '<div style="text-align: center; color: #ffd700; font-size: 6em; font-weight: 900; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00; margin-bottom: 20px;">🎰 CASINO ROYAL 🎰</div><div style="text-align: center; color: #fff; font-size: 2em; margin-bottom: 20px;">✨ Cliquez sur le de ! ✨</div><div style="text-align: center; color: #90ee90; font-size: 1.5em; margin-bottom: 30px;">💸 50 EUR • 💰 100 EUR • 💎 120 EUR • 👑 200 EUR</div><div id="current-player-info" style="text-align: center; color: #ffd700; font-size: 2.5em; margin-bottom: 40px; font-weight: 900;">🎲 ' + players[0].emoji + ' ' + players[0].prenom + ' 🎲</div>';
+    title.innerHTML = `
+        <div style="text-align: center; color: #ffd700; font-size: 6em; font-weight: 900; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff6600; margin-bottom: 20px; animation: neonPulse 1.5s ease-in-out infinite; letter-spacing: 5px;">
+            🎰 CASINO ROYAL 🎰
+        </div>
+        <div style="text-align: center; color: #fff; font-size: 2em; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); font-weight: 600;">
+            ✨ Tentez votre chance ! ✨
+        </div>
+        <div style="text-align: center; color: #90ee90; font-size: 1.5em; margin-bottom: 30px; text-shadow: 0 0 10px #90ee90;">
+            💰 100€ • 💎 300€ • 🏆 500€ • 👑 JACKPOT 1000€
+        </div>
+        <div id="current-player-info" style="text-align: center; color: #ffd700; font-size: 2.5em; margin-bottom: 40px; font-weight: 900; text-shadow: 0 0 30px #ffd700; animation: playerGlow 2s ease-in-out infinite;">
+            🎲 ${players[0].emoji} ${players[0].prenom} 🎲
+        </div>
+    `;
     overlay.appendChild(title);
     
+    // Container pour la machine unique
     const container = document.createElement('div');
-    container.style.cssText = 'display: flex; justify-content: center; align-items: center;';
+    container.style.cssText = `
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
     overlay.appendChild(container);
     
+    // Machine à sous avec rouleaux
     const machine = document.createElement('div');
-    machine.style.cssText = 'background: linear-gradient(135deg, #1a0000, #8b0000, #ff4500, #8b0000, #1a0000); background-size: 400% 400%; padding: 60px; border-radius: 40px; border: 8px solid #ffd700; text-align: center; width: 500px; box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 60px rgba(255,215,0,0.5); animation: machineglow 3s ease-in-out infinite;';
-    machine.innerHTML = '<div class="result-display" style="font-size: 2.5em; color: #ffd700; min-height: 140px; margin-bottom: 40px; font-weight: 900; line-height: 1.4; display: flex; align-items: center; justify-content: center; flex-direction: column;"></div><div id="dice-clickable" style="background: linear-gradient(135deg, #000, #1a1a1a); padding: 50px; border-radius: 30px; font-size: 10em; color: #ffd700; border: 8px solid #ffd700; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s;">🎲</div>';
-    container.appendChild(machine);
+    machine.style.cssText = `
+        background: linear-gradient(135deg, #1a0000 0%, #8b0000 30%, #ff4500 50%, #8b0000 70%, #1a0000 100%);
+        background-size: 400% 400%;
+        padding: 50px;
+        border-radius: 40px;
+        border: 8px solid #ffd700;
+        text-align: center;
+        width: 500px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 215, 0, 0.5), inset 0 0 50px rgba(255, 100, 0, 0.2);
+        animation: machineglow 3s ease-in-out infinite;
+        position: relative;
+    `;
     
-    const style = document.createElement('style');
-    style.textContent = '@keyframes sparklefall { from { transform: translateY(0) rotate(0); opacity: 0.8; } to { transform: translateY(100vh) rotate(720deg); opacity: 0; } } @keyframes machineglow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } } @keyframes diceRoll { 0% { transform: rotate(0deg); } 25% { transform: rotate(90deg); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg); } 100% { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes winFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } } @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); } 20%, 40%, 60%, 80% { transform: translateX(10px); } }';
-    document.head.appendChild(style);
-    
-    const diceElement = machine.querySelector('#dice-clickable');
+    machine.innerHTML = `
+        <div style="font-size: 7em; margin-bottom: 30px; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; animation: slotMachineIcon 2s ease-in-out infinite;">🎰</div>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px;">
+            <div class="reel" data-reel="1" style="
+                background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+                padding: 30px 20px;
+                border-radius: 20px;
+                font-size: 5em;
+                color: #ffd700;
+                border: 5px solid #ffd700;
+                min-height: 150px;
+                width: 140px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: inset 0 5px 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+                font-weight: 900;
+                overflow: hidden;
+                position: relative;
+            ">🎲</div>
+            <div class="reel" data-reel="2" style="
+                background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+                padding: 30px 20px;
+                border-radius: 20px;
+                font-size: 5em;
+                color: #ffd700;
+                border: 5px solid #ffd700;
+                min-height: 150px;
+                width: 140px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: inset 0 5px 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+                font-weight: 900;
+                overflow: hidden;
+                position: relative;
+            ">🎲</div>
+            <div class="reel" data-reel="3" style="
+                background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+                padding: 30px 20px;
+                border-radius: 20px;
+                font-size: 5em;
+                color: #ffd700;
+                border: 5px solid #ffd700;
+                min-height: 150px;720deg); opacity: 0; }
+        }
+        @keyframes neonPulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff6600; }
+            50% { transform: scale(1.05); text-shadow: 0 0 60px #ffd700, 0 0 120px #ff8c00, 0 0 180px #ff6600; }
+        }
+        @keyframes playerGlow {
+            0%, 100% { text-shadow: 0 0 30px #ffd700; }
+            50% { text-shadow: 0 0 50px #ffd700, 0 0 80px #ff8c00; }
+        }
+        @keyframes machineglow {
+            0%, 100% { 
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 60px rgba(255, 215, 0, 0.5), inset 0 0 50px rgba(255, 100, 0, 0.2);
+                background-position: 0% 50%;
+            }
+            50% { 
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 100px rgba(255, 215, 0, 0.8), inset 0 0 80px rgba(255, 100, 0, 0.4);
+                background-position: 100% 50%;
+            }
+        }
+        @keyframes slotMachineIcon {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+          reels = machine.querySelectorAll('.reel');
     const resultDisplay = machine.querySelector('.result-display');
+    const btn = machine.querySelector('.play');
     const playerInfo = document.getElementById('current-player-info');
     
     let currentIndex = 0;
     const stats = {};
-    players.forEach((_, i) => { stats[i] = { gain: 0 }; });
+    players.forEach((_, i) => {
+        stats[i] = { gain: 0 };
+    });
     
+    // Fonction pour jouer un tour
     const playTurn = () => {
         const player = players[currentIndex];
-        playerInfo.innerHTML = '🎲 ' + player.emoji + ' ' + player.prenom + ' 🎲';
-        resultDisplay.innerHTML = '';
-        diceElement.style.pointerEvents = 'auto';
-        diceElement.style.opacity = '1';
         
-        const rollDice = () => {
-            diceElement.style.pointerEvents = 'none';
-            diceElement.style.opacity = '0.5';
-            diceElement.style.animation = 'diceRoll 1s ease-in-out 3';
-            
-            setTimeout(() => {
-                diceElement.style.animation = '';
-                
-                const rand = Math.random();
-                let gain = 0, result = '';
-                
-                if (rand < 0.20) {
-                    gain = 0; 
-                    result = '<div style="font-size: 0.9em;">💔 PERDU 💔</div><div style="font-size: 1.2em; color: #ff0000; font-weight: 900; text-shadow: 0 0 20px #ff0000;">0 EUR</div>';
-                } else if (rand < 0.55) {
-                    gain = 50; 
-                    result = '<div style="font-size: 0.9em;">💸 GAGNE 💸</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+50 EUR</div>';
-                } else if (rand < 0.80) {
-                    gain = 100; 
-                    result = '<div style="font-size: 0.9em;">💰 GAGNE 💰</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+100 EUR</div>';
-                } else if (rand < 0.95) {
-                    gain = 120; 
-                    result = '<div style="font-size: 0.9em;">💎 SUPER GAGNE 💎</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+120 EUR</div>';
-                } else {
-                    gain = 200; 
-                    result = '<div style="font-size: 0.9em;">👑 JACKPOT 👑</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+200 EUR</div>';
-                }
-                
-                resultDisplay.innerHTML = result;
-                stats[currentIndex].gain = gain;
-                
-                if (gain > 0) {
-                    player.money += gain;
-                    displayPlayers();
-                    
-                    if (gain >= 100) {
-                        const confettiCount = gain >= 200 ? 40 : (gain >= 120 ? 30 : 20);
-                        for (let i = 0; i < confettiCount; i++) {
-                            const confetti = document.createElement('div');
-                            confetti.textContent = ['🎉', '🎊', '✨', '💫', '🌟', '⭐'][Math.floor(Math.random() * 6)];
-                            confetti.style.cssText = 'position: absolute; left: 50%; top: 50%; font-size: ' + (2 + Math.random() * 2) + 'em; animation: confettiExplode 2s ease-out forwards;';
-                            overlay.appendChild(confetti);
-                            setTimeout(() => confetti.remove(), 2000);
-                        }
-                    }
-                    
-                    if (gain >= 120) {
-                        machine.style.animation = 'shake 0.5s ease-in-out 2';
-                        setTimeout(() => { machine.style.animation = 'machineglow 3s ease-in-out infinite'; }, 1000);
-                    }
-                }
-                
+        // Mettre à jour l'affichage du joueur actuel
+        playerInfo.innerHTML = `🎲 ${player.emoji} ${player.prenom} 🎲`;
+        resultDisplay.innerHTML = '';
+        
+        // Désactiver le bouton
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.textContent = '🎰 EN COURS... 🎰';
+        
+        // Symboles pour les rouleaux
+        const symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '💎', '7⃣', '👑', '🎁', '💰'];
+        
+        // Animation des rouleaux (un par un)
+        const spinReel = (reelElement, delay, finalSymbol) => {
+            return new Promise(resolve => {
                 setTimeout(() => {
-                    currentIndex++;
-                    
-                    if (currentIndex < players.length) {
-                        diceElement.textContent = '🎲';
-                        diceElement.style.color = '#ffd700';
-                        resultDisplay.innerHTML = '';
-                        
-                        if (players[currentIndex].isBot) {
-                            setTimeout(() => playTurn(), 1500);
-                        } else {
-                            playTurn();
-                        }
-                    } else {
+                    let spinCount = 0;
+                    const spinInterval = setInterval(() => {
+                        reelElement.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                        reelElement.style.transform = 'scale(1.2) rotate(10deg)';
                         setTimeout(() => {
-                            overlay.style.opacity = '0';
-                            overlay.style.transition = 'opacity 1s';
-                            
+                            reelElement.style.transform = 'scale(1) rotate(0deg)';
+                        }, 50);
+                        spinCount++;
+                        
+                        if (spinCount >= 15) {
+                            clearInterval(spinInterval);
+                            reelElement.textContent = finalSymbol;
+                            reelElement.style.animation = 'winFlash 0.3s ease-in-out 2';
                             setTimeout(() => {
-                                overlay.remove();
-                                style.remove();
-                                
-                                players.forEach((player, i) => {
-                                    const gain = stats[i].gain;
-                                    if (gain >= 200) {
-                                        addChatMessage('👑 ' + player.emoji + ' ' + player.prenom + ' a remporte ' + gain + ' EUR au casino !', 'Systeme', true, false);
-                                    } else if (gain > 0) {
-                                        addChatMessage('💰 ' + player.emoji + ' ' + player.prenom + ' a gagne ' + gain + ' EUR au casino', 'Systeme', true, false);
-                                    } else {
-                                        addChatMessage('💔 ' + player.emoji + ' ' + player.prenom + ' n\'a rien gagne', 'Systeme', true, false);
-                                    }
-                                });
-                            }, 1000);
-                        }, 2500);
-                    }
-                }, 2000);
-            }, 3000);
+                                reelElement.style.animation = '';
+                                resolve();
+                            }, 600);
+                        }
+                    }, 100);
+                }, delay);
+            });
         };
         
-        diceElement.onclick = rollDice;
+        // Déterminer le résultat final
+        const rand = Math.random();
+        let gain = 0;
+        let result = '';
+        let resultColor = '';
+        let finalSymbols = [];
         
-        if (player.isBot) {
-            setTimeout(rollDice, 1500);
+        if (rand < 0.25) {
+            // 25% - Rien
+            gain = 0;
+            result = '💔 PERDU 💔';
+            resultColor = '#ff0000';
+            finalSymbols = ['💔', '😢', '😭'];
+        } else if (rand < 0.55) {
+            // 30% - 100€
+            gain = 100;
+            result = '💰 +100€ 💰';
+            resultColor = '#90ee90';
+            finalSymbols = ['💰', '💰', '🪙'];
+        } else if (rand < 0.80) {
+            // 25% - 300€
+            gain = 300;
+            result = '💎 +300€ 💎';
+            resultColor = '#00bfff';
+            finalSymbols = ['💎', '💎', '⭐'];
+        } else if (rand < 0.95) {
+            // 15% - 500€
+            gain = 500;
+            result = '🏆 +500€ 🏆';
+            resultColor = '#ffd700';
+            finalSymbols = ['🏆', '🏆', '👑'];
+        } else {
+            // Passer au joueur suivant après 3 secondes
+            setTimeout(() => {
+                currentIndex++;
+                
+                if (currentIndex < players.length) {
+                    // Réinitialiser l'affichage pour le prochain joueur
+                    reels.forEach(reel => {
+                        reel.textContent = '🎲';
+                        reel.style.color = '#ffd700';
+                    });
+                    resultDisplay.innerHTML = '';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.textContent = '🎲 JOUER MAINTENANT ! 🎲';
+                    
+                    // Si c'est un bot, jouer automatiquement après 1.5 seconde
+                    if (players[currentIndex].isBot) {
+                        setTimeout(() => playTurn(), 1500);
+                    }
+                } else {
+                    // Tous les joueurs ont joué, fermer le casino
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        overlay.style.transition = 'opacity 1s';
+                        
+                        setTimeout(() => {
+                            overlay.remove();
+                            style.remove();
+                            confettiStyle.remove();
+                            
+                            // Messages dans le chat avec emojis
+                            players.forEach((player, i) => {
+                                const gain = stats[i].gain;
+                                if (gain >= 1000) {
+                                    addChatMessage(`👑 ${player.emoji} ${player.prenom} a décroché le JACKPOT de ${gain}€ ! 👑`, 'Système', true, false);
+                                } else if (gain >= 500) {
+                                    addChatMessage(`🏆 ${player.emoji} ${player.prenom} a remporté ${gain}€ au casino !`, 'Système', true, false);
+                                } else if (gain > 0) {
+                                    addChatMessage(`💰 ${player.emoji} ${player.prenom} a gagné ${gain}€ au casino`, 'Système', true, false);
+                                } else {
+                                    addChatMessage(`💔 ${player.emoji} ${player.prenom} n'a rien gagné`, 'Système', true, false);
+                                }
+                          et shake
+    const confettiStyle = document.createElement('style');
+    confettiStyle.textContent = `
+        @keyframes confettiExplode {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(0); opacity: 1; }
+            100% { transform: translate(${Math.random() * 600 - 300}px, ${Math.random() * 600 - 300}px) rotate(${Math.random() * 1080}deg) scale(2); opacity: 0; }
         }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translateX(10px) rotate(2deg)
+                    
+                    // Faire trembler la machine sur grosse victoire
+                    if (gain >= 500) {
+                        machine.style.animation = 'shake 0.5s ease-in-out 3';
+                        setTimeout(() => {
+                            machine.style.animation = 'machineglow 3s ease-in-out infinite';
+                        }, 1500);
+                    }
+                }
+            }, 3
+    
+    // Fonction pour jouer un tour
+    const playTurn = () => {
+        const player = players[currentIndex];
+        
+        // Mettre à jour l'affichage du joueur actuel
+        playerInfo.innerHTML = `Tour de ${player.emoji} ${player.prenom}`;
+        
+        // Désactiver le bouton
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+        
+        // Animation des symboles
+        const symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '💎', '7️⃣', '👑', '🎁'];
+        let count = 0;
+        const interval = setInterval(() => {
+            display.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            count++;
+            
+            if (count >= 20) {
+                clearInterval(interval);
+                
+                // Déterminer le gain
+                const rand = Math.random();
+                let gain = 0;
+                let result = '';
+                
+                if (rand < 0.3) {
+                    gain = 0;
+                    result = '💔';
+                    display.style.color = '#ff0000';
+                } else if (rand < 0.6) {
+                    gain = 100;
+                    result = '💰';
+                    display.style.color = '#90ee90';
+                } else if (rand < 0.85) {
+                    gain = 300;
+                    result = '💎';
+                    display.style.color = '#00bfff';
+                } else {
+                    gain = 500;
+                    result = '🏆';
+                    display.style.color = '#ffd700';
+                }
+                
+                display.textContent = result;
+                stats[currentIndex].gain = gain;
+                
+                // Message de victoire avec effet
+                setTimeout(() => {
+                    if (gain > 0) {
+                        display.textContent = `+${gain}€`;
+                        player.money += gain;
+                        displayPlayers();
+                        
+                        // Animation de victoire
+                        if (gain >= 300) {
+                            for (let i = 0; i < 20; i++) {
+                                const confetti = document.createElement('div');
+                                confetti.textContent = ['🎉', '🎊', '✨', '💫'][Math.floor(Math.random() * 4)];
+                                confetti.style.cssText = `
+                                    position: absolute;
+                                    left: 50%;
+                                    top: 50%;
+                                    font-size: 3em;
+                                    animation: confettiExplode 1.5s ease-out forwards;
+                                    transform: translate(-50%, -50%) rotate(${Math.random() * 360}deg);
+                                `;
+                                overlay.appendChild(confetti);
+                                setTimeout(() => confetti.remove(), 1500);
+                            }
+                        }
+                    }
+                }
+            }, 300);
+            
+            // Passer au joueur suivant après 3 secondes
+            setTimeout(() => {
+                currentIndex++;
+                
+                if (currentIndex < players.length) {
+                    // Réinitialiser l'affichage pour le prochain joueur
+                    reels.forEach(reel => {
+                        reel.textContent = '🎲';
+                        reel.style.color = '#ffd700';
+                    });
+                    resultDisplay.innerHTML = '';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.textContent = '🎲 JOUER MAINTENANT ! 🎲';
+                    
+                    // Si c'est un bot, jouer automatiquement après 1.5 seconde
+                    if (players[currentIndex].isBot) {
+                        setTimeout(() => playTurn(), 1500);
+                    }
+                } else {
+                    // Tous les joueurs ont joué, fermer le casino
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        overlay.style.transition = 'opacity 1s';
+                        
+                        setTimeout(() => {
+                            overlay.remove();
+                            style.remove();
+                            confettiStyle.remove();
+                            
+                            // Messages dans le chat avec emojis
+                            players.forEach((player, i) => {
+                                const gain = stats[i].gain;
+                                if (gain >= 1000) {
+                                    addChatMessage(`👑 ${player.emoji} ${player.prenom} a décroché le JACKPOT de ${gain}€ ! 👑`, 'Système', true, false);
+                                } else if (gain >= 500) {
+                                    addChatMessage(`🏆 ${player.emoji} ${player.prenom} a remporté ${gain}€ au casino !`, 'Système', true, false);
+                                } else if (gain > 0) {
+                                    addChatMessage(`💰 ${player.emoji} ${player.prenom} a gagné ${gain}€ au casino`, 'Système', true, false);
+                                } else {
+                                    addChatMessage(`💔 ${player.emoji} ${player.prenom} n'a rien gagné`, 'Système', true, false);
+                                }
+                            });
+                        }, 1000);
+                    }, 2500);
+                }
+            }, 3000);
+        });
     };
     
+    // Animation confetti et shake
     const confettiStyle = document.createElement('style');
-    confettiStyle.textContent = '@keyframes confettiExplode { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0); opacity: 1; } 100% { transform: translate(' + (Math.random() * 600 - 300) + 'px, ' + (Math.random() * 600 - 300) + 'px) rotate(' + (Math.random() * 1080) + 'deg) scale(2); opacity: 0; } }';
+    confettiStyle.textContent = `
+        @keyframes confettiExplode {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(0); opacity: 1; }
+            100% { transform: translate(${Math.random() * 600 - 300}px, ${Math.random() * 600 - 300}px) rotate(${Math.random() * 1080}deg) scale(2); opacity: 0; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translateX(10px) rotate(2deg); }
+        }
+    `;
     document.head.appendChild(confettiStyle);
     
-    playTurn();
+    // Événement du bouton
+    btn.onclick = playTurn;
+    
+    // Si le premier joueur est un bot, démarrer automatiquement après 1.5 secondes
+    if (players[0].isBot) {
+        setTimeout(() => playTurn(), 1500);
+    }
 }
 
 // Événement "Poulet" - Se déclenche entre 1 et 2 minutes
 function scheduleChickenEvent() {
-    console.log('Poulet planifie dans 5 secondes');
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60000ms (1min) et 120000ms (2min)
+    
     setTimeout(() => {
         triggerChickenEvent();
-    }, 5000);
+    }, delay);
 }
 
 function triggerChickenEvent() {
@@ -2487,10 +2773,11 @@ function triggerChickenEvent() {
 
 // Événement "Noël" - Se déclenche entre 1 et 2 minutes
 function scheduleChristmasEvent() {
-    console.log('Noel planifie dans 5 secondes');
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60000ms (1min) et 120000ms (2min)
+    
     setTimeout(() => {
         triggerChristmasEvent();
-    }, 5000);
+    }, delay);
 }
 
 function triggerChristmasEvent() {
@@ -2872,11 +3159,12 @@ function showUltimateCardDialog(attackerIndex) {
 
 // Événement "La nuit" - Se déclenche une fois entre 1 et 2 minutes
 function scheduleNightEvent() {
-    console.log('Nuit planifie dans 5 secondes');
+    const delay = Math.floor(Math.random() * 60000) + 60000; // Entre 60s (1min) et 120s (2min)
+    
     setTimeout(() => {
         triggerNightEvent();
         // Ne pas planifier un autre événement (une seule fois dans la partie)
-    }, 5000);
+    }, delay);
 }
 
 function triggerNightEvent() {

@@ -1024,9 +1024,6 @@ body.skin-mecha .night-star {
     0% { left: -100%; }
     100% { left: 100%; }
 }
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-    font-weight: 600;
-}
 
 /* Message autre joueur style mecha */
 .skin-mecha .chat-message.other {
