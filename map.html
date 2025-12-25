@@ -32,6 +32,23 @@
             <button id="btn-quit" class="btn-quit">🚪 Quitter la partie</button>
         </div>
 
+        <!-- Chat privé (caché par défaut) -->
+        <div id="private-chat-overlay" class="private-chat-overlay hidden">
+            <div class="private-chat-box">
+                <div class="private-chat-header">
+                    <h3 id="private-chat-title">💬 Chat privé</h3>
+                    <button id="close-private-chat" class="close-private-chat-btn">×</button>
+                </div>
+                <div class="private-chat-messages" id="private-chat-messages">
+                    <p class="chat-welcome">Cliquez sur un joueur pour discuter en privé et élaborer vos stratégies ! 🤝</p>
+                </div>
+                <div class="private-chat-input-section">
+                    <input type="text" id="private-chat-input" placeholder="Message privé..." maxlength="200">
+                    <button id="send-private-chat-btn">Envoyer</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Plateau de jeu -->
         <div class="board-container">
             <div class="board">

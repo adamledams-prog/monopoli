@@ -42,6 +42,7 @@
                 <div class="event-selector-section" style="display: none;">
                     <label class="money-label">🎉 Événement spécial</label>
                     <div class="money-selector">
+                        <button class="event-btn" data-event="none">❌ Aucun</button>
                         <button class="event-btn active" data-event="christmas">🎄 Noël</button>
                         <button class="event-btn" data-event="night">🌙 La Nuit</button>
                         <button class="event-btn" data-event="chicken">🐔 Poulet</button>
@@ -58,6 +59,39 @@
             </div>
 
             <div id="message" class="message"></div>
+        </div>
+
+        <!-- Mini-jeu Morpion -->
+        <div class="tic-tac-toe-box">
+            <h2>🎮 Morpion</h2>
+            <div class="ttt-difficulty">
+                <button class="diff-btn active" data-diff="easy">Facile</button>
+                <button class="diff-btn" data-diff="medium">Moyen</button>
+                <button class="diff-btn" data-diff="hard">Difficile</button>
+            </div>
+            <p class="game-status" id="ttt-status">Votre tour (Rouge)</p>
+            <div class="ttt-board" id="ttt-board">
+                <div class="ttt-cell" data-index="0"></div>
+                <div class="ttt-cell" data-index="1"></div>
+                <div class="ttt-cell" data-index="2"></div>
+                <div class="ttt-cell" data-index="3"></div>
+                <div class="ttt-cell" data-index="4"></div>
+                <div class="ttt-cell" data-index="5"></div>
+                <div class="ttt-cell" data-index="6"></div>
+                <div class="ttt-cell" data-index="7"></div>
+                <div class="ttt-cell" data-index="8"></div>
+            </div>
+            <button id="ttt-reset" class="btn btn-reset">🔄 Nouvelle partie</button>
+            <div class="ttt-score">
+                <div class="score-item">
+                    <span class="score-label">Vous</span>
+                    <span class="score-value" id="player-score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">IA</span>
+                    <span class="score-value" id="ai-score">0</span>
+                </div>
+            </div>
         </div>
     </div>
 

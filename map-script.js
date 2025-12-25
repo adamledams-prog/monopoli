@@ -127,31 +127,6 @@ function checkMoneyAlert(player) {
 }
 
 // Afficher les joueurs
-function displayPlayers() {
-    const playersInfo = document.getElementById('players-info');
-    playersInfo.innerHTML = '';
-
-    players.forEach((player, index) => {
-        const playerItem = document.createElement('div');
-        playerItem.className = 'player-item' + (index === currentPlayerIndex ? ' active' : '');
-
-        playerItem.innerHTML = `
-            <div class="player-item-emoji">${player.emoji}</div>
-            <div class="player-item-info">
-                <div class="player-item-name">${player.prenom}${player.isBot ? ' 🤖' : ''}</div>
-                <div class="player-item-money">${player.money}€</div>
-            </div>
-        `;
-
-        playersInfo.appendChild(playerItem);
-    });
-
-    // Vérifier les alertes d'argent pour chaque joueur
-    players.forEach(player => {
-        checkMoneyAlert(player);
-    });
-}
-
 // Afficher le tour actuel
 function updateCurrentTurn() {
     const currentTurnDiv = document.getElementById('current-turn');
@@ -3221,3 +3196,173 @@ function sendBotWelcomeMessages() {
 setTimeout(() => {
     sendBotWelcomeMessages();
 }, 500);
+
+// ==================== CHAT PRIVÉ ====================
+const privateChatOverlay = document.getElementById('private-chat-overlay');
+const closePrivateChatBtn = document.getElementById('close-private-chat');
+const privateChatInput = document.getElementById('private-chat-input');
+const sendPrivateChatBtn = document.getElementById('send-private-chat-btn');
+const privateChatMessages = document.getElementById('private-chat-messages');
+const privateChatTitle = document.getElementById('private-chat-title');
+
+let currentChatPartner = null; // Le joueur avec qui on discute
+
+// Rendre les joueurs cliquables pour ouvrir un chat privé
+function displayPlayers() {
+    const playersInfo = document.getElementById('players-info');
+    playersInfo.innerHTML = '';
+
+    players.forEach((player, index) => {
+        const playerItem = document.createElement('div');
+        playerItem.className = 'player-item' + (index === currentPlayerIndex ? ' active' : '');
+
+        playerItem.innerHTML = `
+            <div class="player-item-emoji">${player.emoji}</div>
+            <div class="player-item-info">
+                <div class="player-item-name">${player.prenom}${player.isBot ? ' 🤖' : ''}</div>
+                <div class="player-item-money">${player.money}€</div>
+            </div>
+        `;
+
+        // Ajouter le clic pour ouvrir le chat privé (sauf pour soi-même)
+        if (index !== currentPlayerIndex) {
+            playerItem.style.cursor = 'pointer';
+            playerItem.addEventListener('click', () => {
+                openPrivateChat(player);
+            });
+        }
+
+        playersInfo.appendChild(playerItem);
+    });
+
+    // Vérifier les alertes d'argent pour chaque joueur
+    players.forEach(player => {
+        checkMoneyAlert(player);
+    });
+}
+
+// Ouvrir le chat privé avec un joueur
+function openPrivateChat(player) {
+    currentChatPartner = player;
+    privateChatTitle.textContent = `💬 Chat avec ${player.emoji} ${player.prenom}`;
+    privateChatOverlay.classList.remove('hidden');
+    privateChatInput.focus();
+    
+    // Charger les messages existants
+    loadPrivateChatMessages(player);
+}
+
+// Charger les messages du chat privé
+function loadPrivateChatMessages(player) {
+    privateChatMessages.innerHTML = '<p class="chat-welcome">Élaborez vos stratégies en privé ! 🤝</p>';
+    
+    const currentPlayer = players[currentPlayerIndex];
+    const gameCode = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
+    
+    if (window.firebaseManager && gameCode) {
+        // Charger depuis Firebase
+        const chatKey = getChatKey(currentPlayer.prenom, player.prenom);
+        firebase.database().ref(`games/${gameCode}/privateChats/${chatKey}`).once('value', (snapshot) => {
+            const messages = snapshot.val();
+            if (messages) {
+                Object.values(messages).forEach(msg => {
+                    addPrivateChatMessage(msg.from, msg.message, msg.from === currentPlayer.prenom);
+                });
+            }
+        });
+    }
+}
+
+// Créer une clé unique pour le chat entre deux joueurs
+function getChatKey(player1, player2) {
+    return [player1, player2].sort().join('_');
+}
+
+// Fermer le chat privé
+if (closePrivateChatBtn) {
+    closePrivateChatBtn.addEventListener('click', () => {
+        privateChatOverlay.classList.add('hidden');
+        currentChatPartner = null;
+    });
+}
+
+// Envoyer un message privé
+function sendPrivateChatMessage() {
+    if (!currentChatPartner) return;
+    
+    const message = privateChatInput.value.trim();
+    if (message === '') return;
+
+    const currentPlayer = players[currentPlayerIndex];
+    addPrivateChatMessage(currentPlayer.prenom, message, true);
+    
+    privateChatInput.value = '';
+    
+    // Sauvegarder dans Firebase
+    const gameCode = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
+    if (window.firebaseManager && gameCode) {
+        const chatKey = getChatKey(currentPlayer.prenom, currentChatPartner.prenom);
+        firebase.database().ref(`games/${gameCode}/privateChats/${chatKey}`).push({
+            from: currentPlayer.prenom,
+            to: currentChatPartner.prenom,
+            message: message,
+            timestamp: Date.now()
+        });
+    }
+}
+
+// Ajouter un message au chat privé
+function addPrivateChatMessage(from, message, isOwn) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'private-chat-message' + (isOwn ? ' own' : '');
+    
+    const authorSpan = document.createElement('strong');
+    authorSpan.textContent = from;
+    
+    const textSpan = document.createElement('span');
+    textSpan.textContent = message;
+    
+    messageDiv.appendChild(authorSpan);
+    messageDiv.appendChild(document.createElement('br'));
+    messageDiv.appendChild(textSpan);
+    
+    privateChatMessages.appendChild(messageDiv);
+    
+    // Scroll automatique
+    privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
+}
+
+// Bouton envoyer
+if (sendPrivateChatBtn) {
+    sendPrivateChatBtn.addEventListener('click', sendPrivateChatMessage);
+}
+
+// Touche Entrée pour envoyer
+if (privateChatInput) {
+    privateChatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendPrivateChatMessage();
+        }
+    });
+}
+
+// Écouter les nouveaux messages privés en temps réel
+const gameCodeForChat = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
+if (window.firebaseManager && gameCodeForChat) {
+    const currentPlayer = players[currentPlayerIndex];
+    
+    // Écouter tous les chats où on est impliqué
+    players.forEach(player => {
+        if (player.prenom !== currentPlayer.prenom) {
+            const chatKey = getChatKey(currentPlayer.prenom, player.prenom);
+            firebase.database().ref(`games/${gameCodeForChat}/privateChats/${chatKey}`).on('child_added', (snapshot) => {
+                const msg = snapshot.val();
+                
+                // Si on est dans le chat avec ce joueur, afficher le message
+                if (currentChatPartner && currentChatPartner.prenom === player.prenom && msg.from !== currentPlayer.prenom) {
+                    addPrivateChatMessage(msg.from, msg.message, false);
+                }
+            });
+        }
+    });
+}

@@ -1409,3 +1409,414 @@ body.skin-mecha .night-star {
     transform: scale(1.02);
     box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4);
 }
+
+/* === STYLE MECHA POUR MORPION === */
+.skin-mecha .tic-tac-toe-box {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+    border: 3px solid #00d9ff;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 
+                0 20px 60px rgba(0, 0, 0, 0.9),
+                inset 0 0 30px rgba(0, 217, 255, 0.1);
+    backdrop-filter: blur(15px);
+}
+
+.skin-mecha .tic-tac-toe-box h2 {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                 0 0 40px rgba(0, 217, 255, 0.8);
+    animation: neonFlicker 5s ease-in-out infinite;
+}
+
+.skin-mecha .ttt-difficulty {
+    margin-bottom: 20px;
+}
+
+.skin-mecha .diff-btn {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(10, 14, 39, 0.8) 100%);
+    border: 2px solid rgba(0, 217, 255, 0.4);
+    color: rgba(0, 217, 255, 0.7);
+    box-shadow: inset 0 0 15px rgba(0, 217, 255, 0.1);
+}
+
+.skin-mecha .diff-btn:hover {
+    border-color: #00d9ff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5),
+                inset 0 0 20px rgba(0, 217, 255, 0.2);
+    color: #00d9ff;
+}
+
+.skin-mecha .diff-btn.active {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.3) 0%, rgba(0, 140, 204, 0.4) 100%);
+    border-color: #00d9ff;
+    color: #00d9ff;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.7),
+                inset 0 0 20px rgba(0, 217, 255, 0.2);
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+.skin-mecha .game-status {
+    color: #00d9ff;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+}
+
+.skin-mecha .ttt-cell {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(10, 14, 39, 0.9) 100%);
+    border: 3px solid rgba(0, 217, 255, 0.4);
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
+}
+
+.skin-mecha .ttt-cell::before {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(255, 0, 110, 0.15));
+}
+
+.skin-mecha .ttt-cell:hover:not(.taken) {
+    border-color: #00d9ff;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6),
+                inset 0 0 30px rgba(0, 217, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.skin-mecha .ttt-cell.player {
+    color: #ff006e;
+    text-shadow: 0 0 20px rgba(255, 0, 110, 1), 
+                 0 0 40px rgba(255, 0, 110, 0.8),
+                 0 0 60px rgba(255, 0, 110, 0.6);
+    border-color: #ff006e;
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(139, 0, 62, 0.3) 100%);
+}
+
+.skin-mecha .ttt-cell.ai {
+    color: #00d9ff;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                 0 0 40px rgba(0, 217, 255, 0.8),
+                 0 0 60px rgba(0, 217, 255, 0.6);
+    border-color: #00d9ff;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(0, 140, 204, 0.3) 100%);
+}
+
+.skin-mecha .ttt-cell.winner {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.5) 0%, rgba(255, 0, 110, 0.5) 100%);
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8),
+                0 0 50px rgba(255, 0, 110, 0.6),
+                inset 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: mechaWinPulse 0.6s ease infinite;
+}
+
+@keyframes mechaWinPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.8),
+                    0 0 50px rgba(255, 0, 110, 0.6);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 50px rgba(0, 217, 255, 1),
+                    0 0 80px rgba(255, 0, 110, 0.9);
+    }
+}
+
+.skin-mecha .btn-reset {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6),
+                0 8px 25px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+.skin-mecha .btn-reset:hover {
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.9),
+                0 12px 35px rgba(0, 0, 0, 0.8);
+    transform: translateY(-3px);
+}
+
+.skin-mecha .ttt-score {
+    gap: 20px;
+}
+
+.skin-mecha .score-item {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(10, 14, 39, 0.8) 100%);
+    border: 2px solid rgba(0, 217, 255, 0.5);
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1),
+                0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.skin-mecha .score-label {
+    color: #00d9ff;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6);
+}
+
+.skin-mecha .score-value {
+    background: linear-gradient(135deg, #00d9ff 0%, #ff006e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 15px rgba(0, 217, 255, 0.8));
+}
+
+@keyframes neonFlicker {
+    0%, 100% {
+        text-shadow: 0 0 20px rgba(0, 217, 255, 1), 
+                     0 0 40px rgba(0, 217, 255, 0.8), 
+                     0 0 60px rgba(0, 217, 255, 0.6);
+    }
+    50% {
+        text-shadow: 0 0 15px rgba(0, 217, 255, 0.8), 
+                     0 0 30px rgba(0, 217, 255, 0.6), 
+                     0 0 45px rgba(0, 217, 255, 0.4);
+    }
+}
+
+/* === STYLE MECHA POUR CHAT PRIVÉ === */
+.skin-mecha .chat-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
+}
+
+.skin-mecha .chat-box {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%) !important;
+    border: 3px solid #00d9ff !important;
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6), 
+                0 30px 80px rgba(0, 0, 0, 0.9) !important;
+}
+
+.skin-mecha .chat-box h3 {
+    color: #00d9ff !important;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8) !important;
+}
+
+.skin-mecha .chat-box p {
+    color: #00d9ff !important;
+}
+
+.skin-mecha #close-chat {
+    color: #00d9ff !important;
+}
+
+.skin-mecha #close-chat:hover {
+    color: #ff006e !important;
+    text-shadow: 0 0 20px rgba(255, 0, 110, 0.8) !important;
+}
+
+.skin-mecha #chat-messages {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.4) 0%, rgba(10, 14, 39, 0.6) 100%) !important;
+    border: 2px solid rgba(0, 217, 255, 0.3) !important;
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1) !important;
+}
+
+.skin-mecha #chat-input {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(10, 14, 39, 0.8) 100%) !important;
+    border: 2px solid rgba(0, 217, 255, 0.4) !important;
+    color: #00d9ff !important;
+}
+
+.skin-mecha #chat-input:focus {
+    border-color: #00d9ff !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4) !important;
+}
+
+.skin-mecha #chat-input::placeholder {
+    color: rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha #send-message {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 2px solid #00d9ff !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5) !important;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6) !important;
+}
+
+.skin-mecha #send-message:hover {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8) !important;
+}
+
+/* === STYLE MECHA POUR CHAT EN JEU === */
+.skin-mecha .btn-chat {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 2px solid #00d9ff !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5) !important;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6) !important;
+}
+
+.skin-mecha .btn-chat:hover {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8) !important;
+    transform: translateY(-2px);
+}
+
+.skin-mecha .chat-panel {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%) !important;
+    border: 3px solid #00d9ff !important;
+    box-shadow: -10px 0 50px rgba(0, 217, 255, 0.4), 
+                0 0 80px rgba(0, 0, 0, 0.9) !important;
+}
+
+.skin-mecha .chat-header {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border-bottom: 2px solid #00d9ff !important;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha .chat-header h3 {
+    color: #000 !important;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8) !important;
+}
+
+.skin-mecha .close-chat-btn {
+    color: #000 !important;
+}
+
+.skin-mecha .close-chat-btn:hover {
+    color: #ff006e !important;
+    text-shadow: 0 0 20px rgba(255, 0, 110, 0.8) !important;
+}
+
+.skin-mecha .chat-messages {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.4) 0%, rgba(10, 14, 39, 0.6) 100%) !important;
+    border: 2px solid rgba(0, 217, 255, 0.3) !important;
+    box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1) !important;
+}
+
+.skin-mecha .chat-messages::-webkit-scrollbar {
+    background: rgba(15, 52, 96, 0.3) !important;
+}
+
+.skin-mecha .chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 1px solid rgba(0, 217, 255, 0.3) !important;
+}
+
+.skin-mecha .chat-message {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(15, 52, 96, 0.2) 100%) !important;
+    border-left: 3px solid #00d9ff !important;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.2) !important;
+}
+
+.skin-mecha #chat-in-game-input {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(10, 14, 39, 0.8) 100%) !important;
+    border: 2px solid rgba(0, 217, 255, 0.4) !important;
+    color: #00d9ff !important;
+}
+
+.skin-mecha #chat-in-game-input:focus {
+    border-color: #00d9ff !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4) !important;
+}
+
+.skin-mecha #chat-in-game-input::placeholder {
+    color: rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha #send-chat-in-game-btn {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 2px solid #00d9ff !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5) !important;
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6) !important;
+}
+
+.skin-mecha #send-chat-in-game-btn:hover {
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.8) !important;
+}
+
+/* === STYLE MECHA POUR CHAT PRIVÉ === */
+.skin-mecha .player-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha .private-chat-overlay {
+    background: rgba(0, 0, 0, 0.9) !important;
+}
+
+.skin-mecha .private-chat-box {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%) !important;
+    border: 3px solid #00d9ff !important;
+    box-shadow: 0 40px 100px rgba(0, 217, 255, 0.5), 0 0 80px rgba(0, 0, 0, 0.9) !important;
+}
+
+.skin-mecha .private-chat-header {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    box-shadow: 0 5px 30px rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha .private-chat-header h3 {
+    color: #000 !important;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8) !important;
+}
+
+.skin-mecha .close-private-chat-btn {
+    background: rgba(0, 217, 255, 0.2) !important;
+    border: 2px solid #00d9ff !important;
+    color: #00d9ff !important;
+}
+
+.skin-mecha .close-private-chat-btn:hover {
+    background: #00d9ff !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.8) !important;
+}
+
+.skin-mecha .private-chat-messages {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.4) 0%, rgba(10, 14, 39, 0.6) 100%) !important;
+}
+
+.skin-mecha .private-chat-messages::-webkit-scrollbar-track {
+    background: rgba(0, 217, 255, 0.1) !important;
+}
+
+.skin-mecha .private-chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 1px solid rgba(0, 217, 255, 0.3) !important;
+}
+
+.skin-mecha .private-chat-message {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(15, 52, 96, 0.2) 100%) !important;
+    border-left: 4px solid #00d9ff !important;
+    box-shadow: 0 3px 15px rgba(0, 217, 255, 0.3) !important;
+    color: #00d9ff !important;
+}
+
+.skin-mecha .private-chat-message.own {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    color: #000 !important;
+    border-left: none !important;
+    border-right: 4px solid rgba(0, 217, 255, 0.5) !important;
+    box-shadow: 0 3px 20px rgba(0, 217, 255, 0.6) !important;
+}
+
+.skin-mecha .private-chat-input-section {
+    background: rgba(15, 52, 96, 0.4) !important;
+    border-top: 3px solid rgba(0, 217, 255, 0.4) !important;
+    padding: 30px 40px !important;
+}
+
+.skin-mecha .private-chat-input-section input {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(10, 14, 39, 0.8) 100%) !important;
+    border: 3px solid rgba(0, 217, 255, 0.5) !important;
+    color: #00d9ff !important;
+    font-size: 1.2em !important;
+    padding: 20px 25px !important;
+}
+
+.skin-mecha .private-chat-input-section input:focus {
+    border-color: #00d9ff !important;
+    box-shadow: 0 0 0 6px rgba(0, 217, 255, 0.25) !important;
+}
+
+.skin-mecha .private-chat-input-section input::placeholder {
+    color: rgba(0, 217, 255, 0.5) !important;
+}
+
+.skin-mecha .private-chat-input-section button {
+    background: linear-gradient(135deg, #00d9ff 0%, #0f3460 100%) !important;
+    border: 3px solid #00d9ff !important;
+    box-shadow: 0 8px 30px rgba(0, 217, 255, 0.6) !important;
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8) !important;
+    font-size: 1.2em !important;
+    padding: 20px 40px !important;
+}
+
+.skin-mecha .private-chat-input-section button:hover {
+    box-shadow: 0 12px 45px rgba(0, 217, 255, 0.9) !important;
+}
+
+.skin-mecha .chat-welcome {
+    color: #00d9ff !important;
+}
