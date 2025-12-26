@@ -83,6 +83,7 @@ class GameSyncHelper {
     startListening() {
         if (!this.isUsingFirebase) return;
 
+        // Écouter les changements d'état du jeu
         window.firebaseManager.listenToGameState(this.gameCode, (gameState) => {
             if (gameState && gameState.players) {
                 // Mettre à jour l'état local
@@ -99,7 +100,127 @@ class GameSyncHelper {
             }
         });
 
+        // 🆕 Écouter les actions des joueurs en temps réel
+        this.listenToActions();
+
+        // 🆕 Écouter les changements de tour
+        this.listenToCurrentPlayer();
+
         console.log('🔄 Écoute des changements en temps réel activée');
+    }
+
+    /**
+     * 🆕 Écouter les changements de tour
+     */
+    listenToCurrentPlayer() {
+        if (!this.isUsingFirebase) return;
+
+        const currentPlayerRef = window.firebaseManager.db.ref(`games/${this.gameCode}/currentPlayerIndex`);
+
+        currentPlayerRef.on('value', (snapshot) => {
+            const newPlayerIndex = snapshot.val();
+            if (typeof newPlayerIndex === 'number' && newPlayerIndex !== window.currentPlayerIndex) {
+                window.currentPlayerIndex = newPlayerIndex;
+
+                // Mettre à jour l'affichage
+                if (window.displayPlayers) window.displayPlayers();
+                if (window.updateCurrentTurn) window.updateCurrentTurn();
+                if (window.updateTurnUI) window.updateTurnUI();
+
+                console.log(`🔄 Tour changé: joueur ${newPlayerIndex}`);
+            }
+        });
+    }
+
+    /**
+     * 🆕 Écouter les actions des joueurs
+     */
+    listenToActions() {
+        if (!this.isUsingFirebase) return;
+
+        const actionsRef = window.firebaseManager.db.ref(`games/${this.gameCode}/actions`);
+
+        actionsRef.on('child_added', (snapshot) => {
+            const action = snapshot.val();
+
+            // Appliquer l'action localement
+            this.applyAction(action);
+
+            // Supprimer l'action après traitement (évite de la rejouer)
+            snapshot.ref.remove();
+        });
+
+        console.log('👂 Écoute des actions activée');
+    }
+
+    /**
+     * 🆕 Envoyer une action à Firebase
+     */
+    async sendAction(actionType, data) {
+        if (!this.isUsingFirebase) return;
+
+        try {
+            const actionsRef = window.firebaseManager.db.ref(`games/${this.gameCode}/actions`);
+            const newActionRef = actionsRef.push();
+
+            const action = {
+                type: actionType,
+                playerId: localStorage.getItem('currentPlayerId'),
+                data: data,
+                timestamp: Date.now()
+            };
+
+            await newActionRef.set(action);
+            console.log(`📤 Action envoyée: ${actionType}`, data);
+        } catch (error) {
+            console.error('❌ Erreur envoi action:', error);
+        }
+    }
+
+    /**
+     * 🆕 Appliquer une action reçue
+     */
+    applyAction(action) {
+        console.log(`📥 Action reçue: ${action.type}`, action.data);
+
+        switch(action.type) {
+            case 'ROLL_DICE':
+                // L'hôte gère le déplacement et synchronise
+                if (this.isHost) {
+                    const playerIndex = window.players.findIndex(p => p.id === action.playerId);
+                    if (playerIndex !== -1 && playerIndex === window.currentPlayerIndex) {
+                        // Simuler le lancer de dés avec le résultat reçu
+                        if (window.movePlayer) {
+                            const total = action.data.dice1 + action.data.dice2;
+                            window.movePlayer(playerIndex, total);
+                        }
+                    }
+                }
+                break;
+
+            case 'BUY_PROPERTY':
+                if (this.isHost) {
+                    // Traiter l'achat
+                    const playerIndex = window.players.findIndex(p => p.id === action.playerId);
+                    if (playerIndex !== -1) {
+                        // Logique d'achat sera gérée par le code existant
+                        console.log(`💰 ${window.players[playerIndex].prenom} achète la propriété ${action.data.position}`);
+                    }
+                }
+                break;
+
+            case 'END_TURN':
+                if (this.isHost) {
+                    // Passer au joueur suivant
+                    if (window.nextPlayer) {
+                        window.nextPlayer();
+                    }
+                }
+                break;
+
+            default:
+                console.warn(`⚠️ Action inconnue: ${action.type}`);
+        }
     }
 
     /**

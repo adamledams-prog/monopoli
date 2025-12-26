@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Multijoueur - Monopoly</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 { text-align: center; }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #11998e;
+        }
+        .success { border-left-color: #06ffa5; }
+        .error { border-left-color: #ff6b6b; }
+        .warning { border-left-color: #ffd93d; }
+        button {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎲 Test Multijoueur - Monopoly</h1>
+
+    <div class="card">
+        <h2>✅ Correctifs Appliqués</h2>
+        <div class="test-item success">
+            ✅ Système de permissions par tour (isMyTurn, updateTurnUI)
+        </div>
+        <div class="test-item success">
+            ✅ File d'actions Firebase (sendAction, listenToActions)
+        </div>
+        <div class="test-item success">
+            ✅ Synchronisation des dés en temps réel
+        </div>
+        <div class="test-item success">
+            ✅ Système de présence (online/offline)
+        </div>
+        <div class="test-item success">
+            ✅ Reconnexion automatique
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Plan de Test</h2>
+
+        <h3>Test 1: Multijoueur Local (même machine)</h3>
+        <ol>
+            <li>Ouvrir l'onglet 1 et créer une partie</li>
+            <li>Noter le code à 3 chiffres (ex: <code>123</code>)</li>
+            <li>Ouvrir l'onglet 2 et rejoindre avec le code</li>
+            <li>Dans l'onglet 1, lancer la partie</li>
+            <li>Vérifier que chaque joueur peut jouer à son tour</li>
+        </ol>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="window.open('index.html', 'joueur1')">
+                🎮 Ouvrir Joueur 1 (Hôte)
+            </button>
+            <button onclick="window.open('index.html', 'joueur2')" class="btn-secondary">
+                🎮 Ouvrir Joueur 2 (Invité)
+            </button>
+        </div>
+
+        <h3>Test 2: Vérifications Attendues</h3>
+        <div class="test-item">
+            <strong>Lobby:</strong>
+            <ul>
+                <li>✓ Les joueurs apparaissent en temps réel</li>
+                <li>✓ Seul l'hôte peut ajouter des bots</li>
+                <li>✓ Le code à 3 chiffres est affiché</li>
+            </ul>
+        </div>
+
+        <div class="test-item">
+            <strong>En jeu:</strong>
+            <ul>
+                <li>✓ Le bouton "Lancer les dés" est actif seulement pour le joueur actif</li>
+                <li>✓ Le message "À VOUS DE JOUER !" s'affiche pour le bon joueur</li>
+                <li>✓ Les autres voient "Tour de [Nom]" et le bouton désactivé</li>
+                <li>✓ Le déplacement est visible par tous en temps réel</li>
+                <li>✓ Le tour passe automatiquement au joueur suivant</li>
+            </ul>
+        </div>
+
+        <div class="test-item warning">
+            <strong>⚠️ Note importante:</strong> Assurez-vous que Firebase est bien configuré dans <code>firebase-config.js</code> avec vos identifiants.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📊 Checklist de Test</h2>
+
+        <form id="testForm">
+            <div class="test-item">
+                <input type="checkbox" id="test1">
+                <label for="test1"> Deux joueurs peuvent rejoindre le même lobby</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" id="test2">
+                <label for="test2"> Le bouton de dés est actif seulement à mon tour</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" id="test3">
+                <label for="test3"> Je vois le déplacement de l'autre joueur en temps réel</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" id="test4">
+                <label for="test4"> Le tour passe automatiquement au suivant</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" id="test5">
+                <label for="test5"> Les achats de propriétés sont synchronisés</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" id="test6">
+                <label for="test6"> Le message "C'est votre tour" s'affiche correctement</label>
+            </div>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="checkTests()">
+                ✅ Vérifier les résultats
+            </button>
+        </div>
+
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="card">
+        <h2>📝 Résolution de Problèmes</h2>
+
+        <div class="test-item error">
+            <strong>❌ Problème:</strong> "Ce n'est pas votre tour" s'affiche toujours
+            <br><strong>Solution:</strong> Vérifier que <code>currentPlayerId</code> est bien sauvegardé dans localStorage
+        </div>
+
+        <div class="test-item error">
+            <strong>❌ Problème:</strong> Le déplacement ne se synchronise pas
+            <br><strong>Solution:</strong> Vérifier la console (F12) pour les erreurs Firebase
+        </div>
+
+        <div class="test-item error">
+            <strong>❌ Problème:</strong> Les joueurs ne se voient pas dans le lobby
+            <br><strong>Solution:</strong> Vérifier que Firebase Realtime Database est activé et les règles sont en mode test
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <button onclick="window.location.href='index.html'" style="font-size: 20px; padding: 20px 40px;">
+            🚀 LANCER LE JEU
+        </button>
+    </div>
+
+    <script>
+        function checkTests() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+
+            const results = document.getElementById('results');
+
+            let message = '';
+            let className = '';
+
+            if (percentage === 100) {
+                message = '🎉 Parfait ! Le multijoueur fonctionne à 100% !';
+                className = 'success';
+            } else if (percentage >= 70) {
+                message = `✅ Bon travail ! ${percentage}% des tests passent. Encore quelques ajustements.`;
+                className = 'success';
+            } else if (percentage >= 50) {
+                message = `⚠️ ${percentage}% des tests passent. Il reste du travail.`;
+                className = 'warning';
+            } else {
+                message = `❌ Seulement ${percentage}% des tests passent. Vérifiez les correctifs.`;
+                className = 'error';
+            }
+
+            results.innerHTML = `
+                <div class="test-item ${className}" style="text-align: center; font-size: 1.2em;">
+                    ${message}
+                    <br><br>
+                    <strong>${checked}/${total} tests réussis</strong>
+                </div>
+            `;
+        }
+
+        // Vérifier la configuration Firebase
+        window.onload = function() {
+            if (typeof firebase !== 'undefined') {
+                console.log('✅ Firebase chargé');
+            } else {
+                console.warn('⚠️ Firebase non chargé - Le test en ligne ne fonctionnera pas');
+            }
+        };
+    </script>
+</body>
+</html>

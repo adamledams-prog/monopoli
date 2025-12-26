@@ -34,6 +34,84 @@ class FirebaseManager {
     }
 
     /**
+     * 🆕 Configurer la présence en ligne
+     */
+    setupPresence(gameCode, playerId) {
+        if (!this.db) return;
+
+        try {
+            const presenceRef = this.db.ref(`games/${gameCode}/presence/${playerId}`);
+            const playerRef = this.db.ref(`games/${gameCode}/players/${playerId}`);
+
+            // Marquer comme en ligne
+            presenceRef.set({
+                online: true,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // Mettre à jour le statut du joueur
+            playerRef.update({
+                online: true,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // Marquer comme déconnecté si le client perd la connexion
+            presenceRef.onDisconnect().set({
+                online: false,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            playerRef.onDisconnect().update({
+                online: false,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            console.log('✅ Système de présence activé');
+        } catch (error) {
+            console.error('❌ Erreur configuration présence:', error);
+        }
+    }
+
+    /**
+     * 🆕 Reconnecter un joueur à une partie
+     */
+    async reconnect(gameCode, playerId) {
+        try {
+            const gameRef = this.db.ref(`games/${gameCode}`);
+            const snapshot = await gameRef.once('value');
+
+            if (!snapshot.exists()) {
+                throw new Error("Cette partie n'existe plus");
+            }
+
+            const gameData = snapshot.val();
+
+            // Vérifier que le joueur existe toujours dans la partie
+            if (!gameData.players || !gameData.players[playerId]) {
+                throw new Error("Vous n'êtes plus dans cette partie");
+            }
+
+            this.currentPlayerId = playerId;
+            this.currentGame = gameCode;
+
+            // Rétablir la présence
+            this.setupPresence(gameCode, playerId);
+
+            // Mettre à jour le joueur comme en ligne
+            await gameRef.child(`players/${playerId}`).update({
+                online: true,
+                reconnectedAt: Date.now()
+            });
+
+            console.log(`✅ Reconnecté à la partie: ${gameCode}`);
+            return gameData;
+        } catch (error) {
+            console.error("❌ Erreur reconnexion:", error);
+            throw error;
+        }
+    }
+
+    /**
      * Créer une nouvelle partie
      */
     async createGame(player) {
@@ -66,6 +144,9 @@ class FirebaseManager {
             };
 
             await gameRef.set(gameData);
+
+            // 🆕 Configurer la présence
+            this.setupPresence(gameCode, playerId);
 
             // Sauvegarder localement aussi
             localStorage.setItem('currentPlayerId', playerId);
@@ -117,6 +198,9 @@ class FirebaseManager {
                 isBot: false,
                 joinedAt: Date.now()
             });
+
+            // 🆕 Configurer la présence
+            this.setupPresence(gameCode, playerId);
 
             // Sauvegarder localement
             localStorage.setItem('currentPlayerId', playerId);

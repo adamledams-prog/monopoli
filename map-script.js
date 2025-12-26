@@ -7,6 +7,12 @@
             // Initialiser la synchronisation du jeu
             const gameCode = currentPlayer.gameCode;
             const isHost = currentPlayer.isHost;
+            const playerId = localStorage.getItem('currentPlayerId');
+
+            // 🆕 Configurer la présence
+            if (playerId) {
+                window.firebaseManager.setupPresence(gameCode, playerId);
+            }
 
             if (window.gameSyncHelper) {
                 await window.gameSyncHelper.init(gameCode, isHost);
@@ -16,6 +22,27 @@
                     window.gameSyncHelper.startAutoSync();
                 }
             }
+
+            // 🆕 Détection de reconnexion
+            window.addEventListener('online', async () => {
+                console.log('🌐 Connexion rétablie');
+                showNotification('🌐 Connexion rétablie, reconnexion...', 'success');
+
+                try {
+                    await window.firebaseManager.reconnect(gameCode, playerId);
+                    if (window.gameSyncHelper) {
+                        await window.gameSyncHelper.loadGameState();
+                    }
+                    showNotification('✅ Reconnecté avec succès !', 'success');
+                } catch (error) {
+                    showNotification('❌ Erreur de reconnexion', 'error');
+                }
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('📡 Connexion perdue');
+                showNotification('📡 Connexion perdue...', 'error');
+            });
         }
     } catch (error) {
         console.warn('⚠️ Firebase non disponible pour le jeu:', error.message);
@@ -168,9 +195,57 @@ function displayTokens() {
     });
 }
 
+// Vérifier si c'est le tour du joueur actuel
+function isMyTurn() {
+    const myPlayerId = localStorage.getItem('currentPlayerId');
+    if (!myPlayerId) return false;
+
+    const currentTurnPlayer = players[currentPlayerIndex];
+    return currentTurnPlayer && currentTurnPlayer.id === myPlayerId;
+}
+
+// Mettre à jour l'interface selon le tour
+function updateTurnUI() {
+    const rollButton = document.getElementById('btn-roll-dice');
+    const turnIndicator = document.getElementById('current-turn');
+
+    if (isMyTurn()) {
+        // C'est mon tour
+        rollButton.disabled = false;
+        rollButton.style.opacity = '1';
+        rollButton.style.cursor = 'pointer';
+        rollButton.textContent = '🎲 À VOUS DE JOUER !';
+        rollButton.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+        rollButton.style.animation = 'pulse 1.5s infinite';
+
+        if (turnIndicator) {
+            turnIndicator.innerHTML = `<div style="color: #11998e; font-weight: bold; font-size: 1.2em;">✨ C'est votre tour !</div>`;
+        }
+    } else {
+        // Ce n'est pas mon tour
+        const currentTurnPlayer = players[currentPlayerIndex];
+        rollButton.disabled = true;
+        rollButton.style.opacity = '0.5';
+        rollButton.style.cursor = 'not-allowed';
+        rollButton.textContent = `⏰ Tour de ${currentTurnPlayer.prenom}`;
+        rollButton.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        rollButton.style.animation = 'none';
+
+        if (turnIndicator) {
+            turnIndicator.innerHTML = `<div style="color: #667eea;">En attente de ${currentTurnPlayer.emoji} ${currentTurnPlayer.prenom}...</div>`;
+        }
+    }
+}
+
 // Lancer les dés
 function rollDice() {
     if (diceRolling) return;
+
+    // 🆕 VÉRIFICATION : Est-ce mon tour ?
+    if (!isMyTurn()) {
+        showNotification('⏰ Ce n\'est pas votre tour !', 'error');
+        return;
+    }
 
     const currentPlayer = players[currentPlayerIndex];
 
@@ -223,8 +298,17 @@ function rollDice() {
 
             diceResult.innerHTML = `<div style="font-size: 1.5em; margin-bottom: 10px;">${diceEmojis[finalDice1-1]} + ${diceEmojis[finalDice2-1]}</div><div style="font-size: 1.2em; color: #667eea; font-weight: bold;">= ${total}</div>`;
 
-            // Déplacer le joueur
-            movePlayer(currentPlayerIndex, total);
+            // 🆕 Si Firebase est actif et que je ne suis pas un bot, envoyer l'action
+            if (window.gameSyncHelper && window.gameSyncHelper.isUsingFirebase && !isBot) {
+                // Envoyer l'action de lancer de dés
+                window.gameSyncHelper.sendAction('ROLL_DICE', {
+                    dice1: finalDice1,
+                    dice2: finalDice2
+                });
+            } else {
+                // Mode local ou bot : déplacer directement
+                movePlayer(currentPlayerIndex, total);
+            }
 
             // Réinitialiser le diceRolling après un court délai
             setTimeout(() => {
@@ -1768,6 +1852,9 @@ function nextPlayer() {
     displayPlayers();
     updateCurrentTurn();
 
+    // 🆕 Mettre à jour l'interface selon le tour
+    updateTurnUI();
+
     // Synchroniser avec Firebase si on est l'hôte
     if (window.gameSyncHelper && window.gameSyncHelper.isHost) {
         window.gameSyncHelper.syncCurrentPlayer(currentPlayerIndex);
@@ -1786,10 +1873,8 @@ function nextPlayer() {
             rollDice();
         }, 1500);
     } else {
-        // Réactiver le bouton pour les joueurs humains
-        diceButton.disabled = false;
-        diceButton.style.opacity = '1';
-        diceButton.style.cursor = 'pointer';
+        // Pour les joueurs humains, l'interface est gérée par updateTurnUI()
+        // Ne rien faire ici
     }
 }
 
@@ -1964,85 +2049,85 @@ function scheduleCasinoEvent() {
 
 function triggerCasinoEvent() {
     console.log('Declenchement du Casino!');
-    
+
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(139,0,0,0.98), rgba(0,0,0,0.98)); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; animation: fadeIn 0.5s; overflow: hidden;';
     document.body.appendChild(overlay);
-    
+
     for (let i = 0; i < 50; i++) {
         const sparkle = document.createElement('div');
         sparkle.textContent = ['✨', '💰', '🪙', '💎', '⭐'][Math.floor(Math.random() * 5)];
         sparkle.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: -50px; font-size: ' + (1.5 + Math.random() * 1.5) + 'em; animation: sparklefall ' + (3 + Math.random() * 4) + 's linear infinite; animation-delay: ' + (Math.random() * 5) + 's; opacity: ' + (0.4 + Math.random() * 0.4) + ';';
         overlay.appendChild(sparkle);
     }
-    
+
     const title = document.createElement('div');
     title.innerHTML = '<div style="text-align: center; color: #ffd700; font-size: 6em; font-weight: 900; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00; margin-bottom: 20px;">🎰 CASINO ROYAL 🎰</div><div style="text-align: center; color: #fff; font-size: 2em; margin-bottom: 20px;">✨ Cliquez sur le de ! ✨</div><div style="text-align: center; color: #90ee90; font-size: 1.5em; margin-bottom: 30px;">💸 50 EUR • 💰 100 EUR • 💎 120 EUR • 👑 200 EUR</div><div id="current-player-info" style="text-align: center; color: #ffd700; font-size: 2.5em; margin-bottom: 40px; font-weight: 900;">🎲 ' + players[0].emoji + ' ' + players[0].prenom + ' 🎲</div>';
     overlay.appendChild(title);
-    
+
     const container = document.createElement('div');
     container.style.cssText = 'display: flex; justify-content: center; align-items: center;';
     overlay.appendChild(container);
-    
+
     const machine = document.createElement('div');
     machine.style.cssText = 'background: linear-gradient(135deg, #1a0000, #8b0000, #ff4500, #8b0000, #1a0000); background-size: 400% 400%; padding: 60px; border-radius: 40px; border: 8px solid #ffd700; text-align: center; width: 500px; box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 60px rgba(255,215,0,0.5); animation: machineglow 3s ease-in-out infinite;';
     machine.innerHTML = '<div class="result-display" style="font-size: 2.5em; color: #ffd700; min-height: 140px; margin-bottom: 40px; font-weight: 900; line-height: 1.4; display: flex; align-items: center; justify-content: center; flex-direction: column;"></div><div id="dice-clickable" style="background: linear-gradient(135deg, #000, #1a1a1a); padding: 50px; border-radius: 30px; font-size: 10em; color: #ffd700; border: 8px solid #ffd700; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s;">🎲</div>';
     container.appendChild(machine);
-    
+
     const style = document.createElement('style');
     style.textContent = '@keyframes sparklefall { from { transform: translateY(0) rotate(0); opacity: 0.8; } to { transform: translateY(100vh) rotate(720deg); opacity: 0; } } @keyframes machineglow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } } @keyframes diceRoll { 0% { transform: rotate(0deg); } 25% { transform: rotate(90deg); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg); } 100% { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes winFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } } @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); } 20%, 40%, 60%, 80% { transform: translateX(10px); } }';
     document.head.appendChild(style);
-    
+
     const diceElement = machine.querySelector('#dice-clickable');
     const resultDisplay = machine.querySelector('.result-display');
     const playerInfo = document.getElementById('current-player-info');
-    
+
     let currentIndex = 0;
     const stats = {};
     players.forEach((_, i) => { stats[i] = { gain: 0 }; });
-    
+
     const playTurn = () => {
         const player = players[currentIndex];
         playerInfo.innerHTML = '🎲 ' + player.emoji + ' ' + player.prenom + ' 🎲';
         resultDisplay.innerHTML = '';
         diceElement.style.pointerEvents = 'auto';
         diceElement.style.opacity = '1';
-        
+
         const rollDice = () => {
             diceElement.style.pointerEvents = 'none';
             diceElement.style.opacity = '0.5';
             diceElement.style.animation = 'diceRoll 1s ease-in-out 3';
-            
+
             setTimeout(() => {
                 diceElement.style.animation = '';
-                
+
                 const rand = Math.random();
                 let gain = 0, result = '';
-                
+
                 if (rand < 0.20) {
-                    gain = 0; 
+                    gain = 0;
                     result = '<div style="font-size: 0.9em;">💔 PERDU 💔</div><div style="font-size: 1.2em; color: #ff0000; font-weight: 900; text-shadow: 0 0 20px #ff0000;">0 EUR</div>';
                 } else if (rand < 0.55) {
-                    gain = 50; 
+                    gain = 50;
                     result = '<div style="font-size: 0.9em;">💸 GAGNE 💸</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+50 EUR</div>';
                 } else if (rand < 0.80) {
-                    gain = 100; 
+                    gain = 100;
                     result = '<div style="font-size: 0.9em;">💰 GAGNE 💰</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+100 EUR</div>';
                 } else if (rand < 0.95) {
-                    gain = 120; 
+                    gain = 120;
                     result = '<div style="font-size: 0.9em;">💎 SUPER GAGNE 💎</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+120 EUR</div>';
                 } else {
-                    gain = 200; 
+                    gain = 200;
                     result = '<div style="font-size: 0.9em;">👑 JACKPOT 👑</div><div style="font-size: 1.2em; color: #00ff00; font-weight: 900; text-shadow: 0 0 20px #00ff00;">+200 EUR</div>';
                 }
-                
+
                 resultDisplay.innerHTML = result;
                 stats[currentIndex].gain = gain;
-                
+
                 if (gain > 0) {
                     player.money += gain;
                     displayPlayers();
-                    
+
                     if (gain >= 100) {
                         const confettiCount = gain >= 200 ? 40 : (gain >= 120 ? 30 : 20);
                         for (let i = 0; i < confettiCount; i++) {
@@ -2053,21 +2138,21 @@ function triggerCasinoEvent() {
                             setTimeout(() => confetti.remove(), 2000);
                         }
                     }
-                    
+
                     if (gain >= 120) {
                         machine.style.animation = 'shake 0.5s ease-in-out 2';
                         setTimeout(() => { machine.style.animation = 'machineglow 3s ease-in-out infinite'; }, 1000);
                     }
                 }
-                
+
                 setTimeout(() => {
                     currentIndex++;
-                    
+
                     if (currentIndex < players.length) {
                         diceElement.textContent = '🎲';
                         diceElement.style.color = '#ffd700';
                         resultDisplay.innerHTML = '';
-                        
+
                         if (players[currentIndex].isBot) {
                             setTimeout(() => playTurn(), 1500);
                         } else {
@@ -2077,11 +2162,11 @@ function triggerCasinoEvent() {
                         setTimeout(() => {
                             overlay.style.opacity = '0';
                             overlay.style.transition = 'opacity 1s';
-                            
+
                             setTimeout(() => {
                                 overlay.remove();
                                 style.remove();
-                                
+
                                 players.forEach((player, i) => {
                                     const gain = stats[i].gain;
                                     if (gain >= 200) {
@@ -2098,18 +2183,18 @@ function triggerCasinoEvent() {
                 }, 2000);
             }, 3000);
         };
-        
+
         diceElement.onclick = rollDice;
-        
+
         if (player.isBot) {
             setTimeout(rollDice, 1500);
         }
     };
-    
+
     const confettiStyle = document.createElement('style');
     confettiStyle.textContent = '@keyframes confettiExplode { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0); opacity: 1; } 100% { transform: translate(' + (Math.random() * 600 - 300) + 'px, ' + (Math.random() * 600 - 300) + 'px) rotate(' + (Math.random() * 1080) + 'deg) scale(2); opacity: 0; } }';
     document.head.appendChild(confettiStyle);
-    
+
     playTurn();
 }
 
@@ -2138,7 +2223,7 @@ function triggerChickenEvent() {
     `;
     document.body.appendChild(overlay);
     setTimeout(() => overlay.style.background = 'linear-gradient(135deg, rgba(255, 140, 0, 0.4) 0%, rgba(255, 69, 0, 0.3) 100%)', 50);
-    
+
     // Afficher le titre
     const titleDiv = document.createElement('div');
     titleDiv.style.cssText = `
@@ -2177,7 +2262,7 @@ function triggerChickenEvent() {
     `;
     document.body.appendChild(titleDiv);
     setTimeout(() => titleDiv.style.transform = 'translate(-50%, -50%) scale(1)', 100);
-    
+
     // Compteur en temps réel
     const scoreDiv = document.createElement('div');
     scoreDiv.style.cssText = `
@@ -2202,7 +2287,7 @@ function triggerChickenEvent() {
         <div id="chicken-score" style="font-size: 2em; color: #00ff00;">0€</div>
     `;
     document.body.appendChild(scoreDiv);
-    
+
     // Compteur de poulets attrapés et argent gagné par joueur
     const chickenCaught = {};
     const moneyEarned = {};
@@ -2211,7 +2296,7 @@ function triggerChickenEvent() {
         chickenCaught[index] = 0;
         moneyEarned[index] = 0;
     });
-    
+
     // Créer des étoiles de fond
     for (let i = 0; i < 30; i++) {
         setTimeout(() => {
@@ -2230,17 +2315,17 @@ function triggerChickenEvent() {
             overlay.appendChild(star);
         }, i * 100);
     }
-    
+
     // Attendre 2 secondes avant de faire tomber les poulets
     setTimeout(() => {
         // Masquer le titre
         titleDiv.style.top = '5%';
         titleDiv.style.transform = 'translate(-50%, 0) scale(0.7)';
-        
+
         // Créer et faire tomber 60 poulets
         const totalChickens = 60;
         const chickensCreated = [];
-        
+
         for (let i = 0; i < totalChickens; i++) {
             setTimeout(() => {
                 const chicken = document.createElement('div');
@@ -2259,18 +2344,18 @@ function triggerChickenEvent() {
                     pointer-events: all;
                     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
                 `;
-                
+
                 // Gestion du clic sur le poulet
                 chicken.addEventListener('click', function(e) {
                     if (!this.clicked) {
                         this.clicked = true;
-                        
+
                         // Trouver le joueur actuel
                         const currentIndex = currentPlayerIndex;
                         chickenCaught[currentIndex]++;
                         moneyEarned[currentIndex] += 10;
                         totalMoney += 10;
-                        
+
                         // Mettre à jour le score
                         const scoreElement = document.getElementById('chicken-score');
                         if (scoreElement) {
@@ -2278,11 +2363,11 @@ function triggerChickenEvent() {
                             scoreElement.style.transform = 'scale(1.3)';
                             setTimeout(() => scoreElement.style.transform = 'scale(1)', 200);
                         }
-                        
+
                         // Ajouter l'argent
                         players[currentIndex].money += 10;
                         displayPlayers();
-                        
+
                         // Créer l'animation "+10€" à l'endroit du clic avec effet combo
                         const plusTen = document.createElement('div');
                         plusTen.textContent = '+10€';
@@ -2299,7 +2384,7 @@ function triggerChickenEvent() {
                             animation: floatUp 1.2s ease forwards;
                         `;
                         document.body.appendChild(plusTen);
-                        
+
                         // Créer des particules d'explosion
                         for (let j = 0; j < 8; j++) {
                             const particle = document.createElement('div');
@@ -2316,36 +2401,36 @@ function triggerChickenEvent() {
                             document.body.appendChild(particle);
                             setTimeout(() => particle.remove(), 800);
                         }
-                        
+
                         // Supprimer le "+10€" après l'animation
                         setTimeout(() => plusTen.remove(), 1200);
-                        
+
                         // Faire disparaître le poulet avec effet
                         this.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                         this.style.transform = 'scale(2) rotate(720deg)';
                         this.style.opacity = '0';
-                        
+
                         setTimeout(() => this.remove(), 400);
                     }
                 });
-                
+
                 chicken.addEventListener('mouseover', function() {
                     if (!this.clicked) {
                         this.style.transform = 'scale(1.4) rotate(15deg)';
                         this.style.filter = 'drop-shadow(0 8px 15px rgba(255, 140, 0, 0.8))';
                     }
                 });
-                
+
                 chicken.addEventListener('mouseout', function() {
                     if (!this.clicked) {
                         this.style.transform = 'scale(1) rotate(0deg)';
                         this.style.filter = 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5))';
                     }
                 });
-                
+
                 document.body.appendChild(chicken);
                 chickensCreated.push(chicken);
-                
+
                 // Supprimer le poulet après l'animation
                 setTimeout(() => {
                     if (!chicken.clicked) {
@@ -2355,17 +2440,17 @@ function triggerChickenEvent() {
             }, i * 120); // Un poulet tous les 120ms
         }
     }, 2000); // Attendre 2 secondes
-    
+
     // Nettoyer après 19 secondes (2s attente + 17s événement)
     setTimeout(() => {
         titleDiv.style.transform = 'translate(-50%, 0) scale(0)';
         scoreDiv.style.transform = 'scale(0)';
-        
+
         // Afficher le récapitulatif
         setTimeout(() => {
             titleDiv.remove();
             scoreDiv.remove();
-            
+
             // Créer le message récapitulatif avec style amélioré
             const summaryDiv = document.createElement('div');
             summaryDiv.style.cssText = `
@@ -2384,19 +2469,19 @@ function triggerChickenEvent() {
                 pointer-events: none;
                 max-width: 700px;
             `;
-            
+
             let summaryHTML = `
                 <div style="font-size: 4em; margin-bottom: 20px; animation: bounce 1s ease infinite; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));">🎉</div>
                 <h2 style="
-                    color: #fff; 
-                    margin-bottom: 35px; 
-                    font-size: 2.8em; 
+                    color: #fff;
+                    margin-bottom: 35px;
+                    font-size: 2.8em;
                     text-shadow: 0 5px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.8);
                     font-weight: 900;
                     letter-spacing: 3px;
                 ">RÉSULTATS FINAUX</h2>
             `;
-            
+
             // Trier les joueurs par argent gagné
             const sortedPlayers = players.map((player, index) => ({
                 player,
@@ -2404,7 +2489,7 @@ function triggerChickenEvent() {
                 caught: chickenCaught[index],
                 earned: moneyEarned[index]
             })).filter(p => p.earned > 0).sort((a, b) => b.earned - a.earned);
-            
+
             sortedPlayers.forEach((data, rank) => {
                 const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🏅';
                 summaryHTML += `
@@ -2422,13 +2507,13 @@ function triggerChickenEvent() {
                         animation: slideIn ${0.3 + rank * 0.1}s ease forwards;
                     ">
                         ${medal} ${data.player.emoji} <strong>${data.player.prenom}</strong><br>
-                        <span style="color: #00ff00; font-size: 1.1em;">${data.caught} poulets 🐔</span> 
-                        = 
+                        <span style="color: #00ff00; font-size: 1.1em;">${data.caught} poulets 🐔</span>
+                        =
                         <span style="color: #ffd700; font-size: 1.3em; text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);">+${data.earned}€ 💰</span>
                     </div>
                 `;
             });
-            
+
             if (sortedPlayers.length === 0) {
                 summaryHTML += `
                     <div style="color: #fff; font-size: 1.5em; margin: 20px 0;">
@@ -2436,20 +2521,20 @@ function triggerChickenEvent() {
                     </div>
                 `;
             }
-            
+
             summaryDiv.innerHTML = summaryHTML;
             document.body.appendChild(summaryDiv);
             setTimeout(() => summaryDiv.style.transform = 'translate(-50%, -50%) scale(1)', 100);
-            
+
             // Fermer après 4 secondes
             setTimeout(() => {
                 summaryDiv.style.transform = 'translate(-50%, -50%) scale(0)';
                 overlay.style.background = 'rgba(255, 140, 0, 0)';
-                
+
                 setTimeout(() => {
                     summaryDiv.remove();
                     overlay.remove();
-                    
+
                     // Messages dans le chat
                     sortedPlayers.forEach((data) => {
                         addChatMessage(`🐔 ${data.player.emoji} ${data.player.prenom} a attrapé ${data.caught} poulet(s) et gagné ${data.earned}€ !`, 'Système', true, false);
@@ -2486,7 +2571,7 @@ function triggerChristmasEvent() {
     setTimeout(() => {
         overlay.style.background = 'rgba(10, 50, 10, 0.85)';
     }, 50);
-    
+
     // Créer des flocons de neige
     for (let i = 0; i < 100; i++) {
         const snowflake = document.createElement('div');
@@ -2504,7 +2589,7 @@ function triggerChristmasEvent() {
         document.body.appendChild(snowflake);
         setTimeout(() => snowflake.remove(), 15000);
     }
-    
+
     // Afficher les cadeaux joueur par joueur
     showPlayerChristmasGifts(0, overlay);
 }
@@ -2516,9 +2601,9 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
         setTimeout(() => overlay.remove(), 500);
         return;
     }
-    
+
     const player = players[playerIndex];
-    
+
     // Message de Noël pour ce joueur
     const christmasMessage = document.createElement('div');
     christmasMessage.className = 'christmas-dialog';
@@ -2539,7 +2624,7 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
         backdrop-filter: none;
         filter: none;
     `;
-    
+
     // Créer 6 cadeaux
     let giftsHTML = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">';
     for (let i = 0; i < 6; i++) {
@@ -2557,7 +2642,7 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
         `;
     }
     giftsHTML += '</div>';
-    
+
     christmasMessage.innerHTML = `
         <div style="font-size: 5em; margin-bottom: 20px; animation: bounce 1s ease infinite;">🎄</div>
         <h2 style="
@@ -2585,10 +2670,10 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
         </div>
         ${giftsHTML}
     `;
-    
+
     document.body.appendChild(christmasMessage);
     setTimeout(() => christmasMessage.style.transform = 'translate(-50%, -50%) scale(1)', 100);
-    
+
     // Gestion des clics sur les cadeaux
     document.querySelectorAll('.gift-choice-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -2597,23 +2682,23 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
                 b.disabled = true;
                 b.style.cursor = 'not-allowed';
             });
-            
+
             // Animation du cadeau choisi
             this.style.transform = 'scale(1.3) rotate(360deg)';
-            
+
             // Faire disparaître tous les cadeaux avec animation
             setTimeout(() => {
                 const giftsGrid = this.parentElement;
                 giftsGrid.style.transition = 'all 0.5s ease';
                 giftsGrid.style.opacity = '0';
                 giftsGrid.style.transform = 'scale(0.5)';
-                
+
                 setTimeout(() => {
                     giftsGrid.remove();
-                    
+
                     // Ouvrir le cadeau et afficher la récompense
                     openChristmasGift(playerIndex, this, christmasMessage);
-                    
+
                     // Passer au joueur suivant après 3 secondes
                     setTimeout(() => {
                         christmasMessage.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -2626,7 +2711,7 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
             }, 800);
         });
     });
-    
+
     // Si c'est un bot, choisir automatiquement après un délai
     if (player.isBot) {
         setTimeout(() => {
@@ -2641,7 +2726,7 @@ function showPlayerChristmasGifts(playerIndex, overlay) {
 
 function openChristmasGift(playerIndex, btnElement, messageElement) {
     const player = players[playerIndex];
-    
+
     // Types de récompenses
     const rewards = [
         { type: 'money', weight: 35 },
@@ -2650,12 +2735,12 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
         { type: 'chance-good', weight: 20 },
         { type: 'ultimate', weight: 10 }
     ];
-    
+
     // Sélection aléatoire pondérée
     const totalWeight = rewards.reduce((sum, r) => sum + r.weight, 0);
     let random = Math.random() * totalWeight;
     let selectedReward = rewards[0];
-    
+
     for (let reward of rewards) {
         random -= reward.weight;
         if (random <= 0) {
@@ -2663,11 +2748,11 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
             break;
         }
     }
-    
+
     // Appliquer la récompense
     let rewardText = '';
     let rewardEmoji = '🎁';
-    
+
     switch (selectedReward.type) {
         case 'money':
             const amount = Math.floor(Math.random() * 61) + 40; // 40-100€
@@ -2676,14 +2761,14 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
             rewardEmoji = '💰';
             showFloatingMessage(`${player.emoji} +${amount}€`, 'success');
             break;
-            
+
         case 'jail-card':
             player.jailFreeCards++;
             rewardText = 'Carte Sortie de Prison';
             rewardEmoji = '🎫';
             showFloatingMessage(`${player.emoji} 🎫 CARTE PRISON`, 'success');
             break;
-            
+
         case 'teleport':
             // Cases entre 13 et 19 (Rue de Paradis à Place Pigalle)
             const teleportPositions = [13, 14, 16, 18, 19];
@@ -2696,7 +2781,7 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
             showFloatingMessage(`${player.emoji} ✨ TÉLÉPORTATION`, 'info');
             setTimeout(() => checkLanding(playerIndex), 1000);
             break;
-            
+
         case 'chance-good':
             // Cartes Chance positives uniquement
             const goodChanceCards = [
@@ -2711,7 +2796,7 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
             rewardEmoji = '🎲';
             showFloatingMessage(`${player.emoji} +${card.amount}€`, 'success');
             break;
-            
+
         case 'ultimate':
             rewardText = 'Carte ULTIME : Volez 50€ à un adversaire !';
             rewardEmoji = '⚡';
@@ -2733,7 +2818,7 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
             }
             break;
     }
-    
+
     // Afficher la récompense en grand
     const rewardDiv = document.createElement('div');
     rewardDiv.style.cssText = `
@@ -2754,16 +2839,16 @@ function openChristmasGift(playerIndex, btnElement, messageElement) {
         <div style="font-size: 1.1em; line-height: 1.4;">${rewardText}</div>
     `;
     messageElement.appendChild(rewardDiv);
-    
+
     displayPlayers();
-    
+
     // Message au chat
     addChatMessage(`🎁 ${player.emoji} ${player.prenom} a ouvert son cadeau : ${rewardText}`, 'Système', true, false);
 }
 
 function showUltimateCardDialog(attackerIndex) {
     const attacker = players[attackerIndex];
-    
+
     const dialog = document.createElement('div');
     dialog.style.cssText = `
         position: fixed;
@@ -2779,7 +2864,7 @@ function showUltimateCardDialog(attackerIndex) {
         border: 4px solid #ff006e;
         animation: scaleIn 0.3s ease forwards;
     `;
-    
+
     let victimsHTML = '';
     players.forEach((player, index) => {
         if (index !== attackerIndex) {
@@ -2809,7 +2894,7 @@ function showUltimateCardDialog(attackerIndex) {
             `;
         }
     });
-    
+
     dialog.innerHTML = `
         <div style="font-size: 4em; margin-bottom: 20px;">⚡</div>
         <h2 style="
@@ -2826,19 +2911,19 @@ function showUltimateCardDialog(attackerIndex) {
             ${victimsHTML}
         </div>
     `;
-    
+
     document.body.appendChild(dialog);
-    
+
     document.querySelectorAll('.victim-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const victimIndex = parseInt(this.getAttribute('data-victim-index'));
             const victim = players[victimIndex];
-            
+
             victim.money -= 50;
             displayPlayers();
             showFloatingMessage(`${victim.emoji} -50€ PAR ${attacker.emoji}`, 'error');
             addChatMessage(`⚡ ${attacker.emoji} ${attacker.prenom} a utilisé la carte ULTIME sur ${victim.emoji} ${victim.prenom} ! -50€`, 'Système', true, false);
-            
+
             dialog.style.transform = 'translate(-50%, -50%) scale(0)';
             setTimeout(() => dialog.remove(), 300);
         });
@@ -2861,7 +2946,7 @@ function triggerNightEvent() {
         originalIndex: index,
         reward: Math.floor(Math.random() * 61) + 40 // Entre 40 et 100
     })).sort((a, b) => b.player.money - a.player.money);
-    
+
     // Créer l'overlay sombre
     const overlay = document.createElement('div');
     overlay.className = 'night-overlay';
@@ -2877,7 +2962,7 @@ function triggerNightEvent() {
     `;
     document.body.appendChild(overlay);
     setTimeout(() => overlay.style.background = 'rgba(0, 0, 20, 0.9)', 50);
-    
+
     // Créer des étoiles et particules
     for (let i = 0; i < 80; i++) {
         const star = document.createElement('div');
@@ -2897,7 +2982,7 @@ function triggerNightEvent() {
         document.body.appendChild(star);
         setTimeout(() => star.remove(), 12000);
     }
-    
+
     // Message "La nuit"
     const nightMessage = document.createElement('div');
     nightMessage.className = 'night-dialog';
@@ -2916,7 +3001,7 @@ function triggerNightEvent() {
         transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         max-width: 600px;
     `;
-    
+
     // Créer la liste des joueurs
     let playersListHTML = '';
     sortedPlayers.forEach((item, index) => {
@@ -2924,7 +3009,7 @@ function triggerNightEvent() {
         const rankEmoji = index < 3 ? medals[index] : `${index + 1}.`;
         const borderColor = index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#9090ff';
         const glowColor = index === 0 ? 'rgba(255, 215, 0, 0.5)' : index === 1 ? 'rgba(192, 192, 192, 0.5)' : index === 2 ? 'rgba(205, 127, 50, 0.5)' : 'rgba(144, 144, 255, 0.3)';
-        
+
         playersListHTML += `
             <div class="night-player-item" id="night-player-${index}" style="
                 opacity: 0;
@@ -2984,7 +3069,7 @@ function triggerNightEvent() {
             </div>
         `;
     });
-    
+
     nightMessage.innerHTML = `
         <div class="night-icon" style="font-size: 4.5em; margin-bottom: 15px; animation: bounce 1s ease infinite;">🌙</div>
         <h2 class="night-title" style="
@@ -3006,10 +3091,10 @@ function triggerNightEvent() {
             ${playersListHTML}
         </div>
     `;
-    
+
     document.body.appendChild(nightMessage);
     setTimeout(() => nightMessage.style.transform = 'translate(-50%, -50%) scale(1)', 100);
-    
+
     // Animer l'apparition des joueurs et l'attribution des récompenses
     setTimeout(() => {
         sortedPlayers.forEach((item, index) => {
@@ -3019,7 +3104,7 @@ function triggerNightEvent() {
                 if (playerItem) {
                     playerItem.style.opacity = '1';
                     playerItem.style.transform = 'translateX(0) scale(1)';
-                    
+
                     // Après 300ms, afficher la récompense
                     setTimeout(() => {
                         const rewardEl = playerItem.querySelector('.night-reward');
@@ -3030,30 +3115,30 @@ function triggerNightEvent() {
                                 rewardEl.style.transform = 'scale(1) rotate(0deg)';
                             }, 200);
                         }
-                        
+
                         // Appliquer la récompense au joueur
                         item.player.money += item.reward;
                         displayPlayers();
-                        
+
                         // Message flottant
                         showFloatingMessage(`${item.player.emoji} +${item.reward}€`, 'success');
                     }, 300);
                 }
             }, index * 800); // 800ms entre chaque joueur
         });
-        
+
         // Ajouter message au chat après toutes les récompenses
         const totalDelay = sortedPlayers.length * 800 + 1000;
         setTimeout(() => {
             addChatMessage(`🌙 La nuit est tombée ! Tous les joueurs ont reçu leur récompense !`, 'Système', true, false);
-            
+
             // Messages des bots
             setTimeout(() => {
                 const bots = players.filter(p => p.isBot);
                 if (bots.length > 0) {
                     const randomBot = bots[Math.floor(Math.random() * bots.length)];
                     const botReward = sortedPlayers.find(item => item.player.prenom === randomBot.prenom);
-                    
+
                     let message = '';
                     if (botReward && botReward.reward >= 80) {
                         const messages = [
@@ -3070,12 +3155,12 @@ function triggerNightEvent() {
                         ];
                         message = messages[Math.floor(Math.random() * messages.length)];
                     }
-                    
+
                     addChatMessage(message, randomBot.prenom, false, true);
                 }
             }, 500);
         }, totalDelay);
-        
+
         // Fermer le dialogue après tout
         setTimeout(() => {
             nightMessage.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -3092,6 +3177,11 @@ function triggerNightEvent() {
 displayPlayers();
 updateCurrentTurn();
 displayTokens();
+
+// 🆕 Mettre à jour l'interface selon le tour (pour multijoueur)
+if (typeof updateTurnUI === 'function') {
+    updateTurnUI();
+}
 
 // Démarrer l'événement selon le choix du joueur
 const eventType = players[0].eventType || 'christmas';
@@ -3247,7 +3337,7 @@ function openPrivateChat(player) {
     privateChatTitle.textContent = `💬 Chat avec ${player.emoji} ${player.prenom}`;
     privateChatOverlay.classList.remove('hidden');
     privateChatInput.focus();
-    
+
     // Charger les messages existants
     loadPrivateChatMessages(player);
 }
@@ -3255,10 +3345,10 @@ function openPrivateChat(player) {
 // Charger les messages du chat privé
 function loadPrivateChatMessages(player) {
     privateChatMessages.innerHTML = '<p class="chat-welcome">Élaborez vos stratégies en privé ! 🤝</p>';
-    
+
     const currentPlayer = players[currentPlayerIndex];
     const gameCode = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
-    
+
     if (window.firebaseManager && gameCode) {
         // Charger depuis Firebase
         const chatKey = getChatKey(currentPlayer.prenom, player.prenom);
@@ -3289,15 +3379,15 @@ if (closePrivateChatBtn) {
 // Envoyer un message privé
 function sendPrivateChatMessage() {
     if (!currentChatPartner) return;
-    
+
     const message = privateChatInput.value.trim();
     if (message === '') return;
 
     const currentPlayer = players[currentPlayerIndex];
     addPrivateChatMessage(currentPlayer.prenom, message, true);
-    
+
     privateChatInput.value = '';
-    
+
     // Sauvegarder dans Firebase
     const gameCode = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
     if (window.firebaseManager && gameCode) {
@@ -3315,19 +3405,19 @@ function sendPrivateChatMessage() {
 function addPrivateChatMessage(from, message, isOwn) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'private-chat-message' + (isOwn ? ' own' : '');
-    
+
     const authorSpan = document.createElement('strong');
     authorSpan.textContent = from;
-    
+
     const textSpan = document.createElement('span');
     textSpan.textContent = message;
-    
+
     messageDiv.appendChild(authorSpan);
     messageDiv.appendChild(document.createElement('br'));
     messageDiv.appendChild(textSpan);
-    
+
     privateChatMessages.appendChild(messageDiv);
-    
+
     // Scroll automatique
     privateChatMessages.scrollTop = privateChatMessages.scrollHeight;
 }
@@ -3350,14 +3440,14 @@ if (privateChatInput) {
 const gameCodeForChat = JSON.parse(localStorage.getItem('currentPlayer'))?.gameCode;
 if (window.firebaseManager && gameCodeForChat) {
     const currentPlayer = players[currentPlayerIndex];
-    
+
     // Écouter tous les chats où on est impliqué
     players.forEach(player => {
         if (player.prenom !== currentPlayer.prenom) {
             const chatKey = getChatKey(currentPlayer.prenom, player.prenom);
             firebase.database().ref(`games/${gameCodeForChat}/privateChats/${chatKey}`).on('child_added', (snapshot) => {
                 const msg = snapshot.val();
-                
+
                 // Si on est dans le chat avec ce joueur, afficher le message
                 if (currentChatPartner && currentChatPartner.prenom === player.prenom && msg.from !== currentPlayer.prenom) {
                     addPrivateChatMessage(msg.from, msg.message, false);
